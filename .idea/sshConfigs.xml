@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="zh-bel.tk" id="31132c49-20c9-4e2b-936f-15467cc06425" port="22" nameFormat="DESCRIPTIVE" username="admin" />
+    </configs>
+  </component>
+</project>
