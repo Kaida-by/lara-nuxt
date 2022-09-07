@@ -19,30 +19,27 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class PersonalCabinetController
 {
-    protected Article $article;
-    protected User $user;
-
     const ENTITY_TYPE = 2;
     const CATEGORY = 2;
 
-    public function __construct(Article $article, User $user)
+    protected Article $article;
+    protected $profileId;
+
+    public function __construct(Article $article, Request $request)
     {
         $this->article = $article;
-        $this->user = $user;
+        $this->profileId = Profile::select('id')->where(['user_id' => 1])->limit(1)->get();
     }
 
     public function getMyArticles(Request $request): AnonymousResourceCollection
     {
-        $userId = $request->user()->id;
-        $profileId = Profile::select('id')->where(['id' => $userId])->limit(1)->get();
-
         $articles = Article::with([
             'images' => function($q) {
                 $q->where('entity_type_id', self::ENTITY_TYPE);
             }
         ])
             ->where(['status_id' => Article::ENTITY_STATUS_ACTIVE])
-            ->where(['author_id' => $profileId[0]->id])
+            ->where(['author_id' => $this->profileId[0]->id])
             ->simplePaginate(10);
 
         return ArticleResource::collection($articles);
@@ -107,12 +104,20 @@ class PersonalCabinetController
             'images'
         ])
             ->where(['id' => $id])
+            ->where(['author_id' => $this->profileId[0]->id])
             ->get();
 
-        return \response()->json([
-            'success' => true,
-            'data' => $article
-        ], 200);
+        if (count($article) > 0) {
+            return \response()->json([
+                'success' => true,
+                'data' => $article
+            ], 200);
+        } else {
+            return \response()->json([
+                'success' => false,
+                'data' => $article
+            ], 404);
+        }
     }
 
     public function update(ArticleRequest $request, $id): JsonResponse
