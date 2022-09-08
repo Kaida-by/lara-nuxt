@@ -13,6 +13,11 @@
         </div>
       </div>
 
+<!--      <label>File Preview-->
+<!--        <input type="file" id="file" ref="file" accept="image/*" v-on:change="handleFileUpload()"/>-->
+<!--      </label>-->
+<!--      <img v-bind:src="imagePreview" v-show="showPreview"/>-->
+
       <div class="invalid-feedback" v-if="errors.text">
         {{ errors.text[0] }}
       </div>
@@ -39,22 +44,41 @@ export default {
         description: '',
         author_id: this.$auth.user.id,
       },
+      file: '',
+      showPreview: false,
+      imagePreview: '',
       files: [],
       error: this.$route.query.error
     }
   },
   methods: {
     async create() {
-      let form = new FormData();
-      for( var i = 0; i < this.files.length; i++ ){
-        let file = this.files[i];
-        form.append('files[' + i + ']', file)
-        _.each(this.form, (value, key) => {
-          form.append(key, value)});
+      if (this.files.length > 0) {
+        let form = new FormData();
+        for( var i = 0; i < this.files.length; i++ ){
+          let file = this.files[i];
+          form.append('files[' + i + ']', file)
+          _.each(this.form, (value, key) => {
+            form.append(key, value)});
+        }
+        await this.$axios.post('/article/store', form, {})
+      } else {
+        await this.$axios.post('/article/store', this.form, {})
       }
-
-      await this.$axios.post('/article/store', form, {})
     },
+    // handleFileUpload() {
+    //   this.file = this.$refs.file.files[0];
+    //   let reader  = new FileReader();
+    //   reader.addEventListener("load", function () {
+    //     this.showPreview = true;
+    //     this.imagePreview = reader.result;
+    //   }.bind(this), false);
+    //   if( this.file ){
+    //     if ( /\.(jpe?g|png|gif)$/i.test( this.file.name ) ) {
+    //       reader.readAsDataURL( this.file );
+    //     }
+    //   }
+    // },
     handleFilesUpload() {
       let uploadedFiles = this.$refs.files.files;
       for( var i = 0; i < uploadedFiles.length; i++ ){
@@ -69,5 +93,7 @@ export default {
 </script>
 
 <style scoped>
-
+  img {
+    width: 240px;
+  }
 </style>
