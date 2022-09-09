@@ -58,6 +58,8 @@ class PersonalCabinetController
 
         $lastId = Article::latest()->first()->id ?? 0;
         $currentId = $lastId + 1;
+        var_dump($request->get('description'));
+        var_dump($request->files->get('files'));
 
 //        UploadImagesService::save($request->files->get('files'), self::ENTITY_TYPE, $currentId);
 
