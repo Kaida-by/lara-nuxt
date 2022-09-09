@@ -13,10 +13,7 @@
         </div>
       </div>
 
-<!--      <label>File Preview-->
-<!--        <input type="file" id="file" ref="file" accept="image/*" v-on:change="handleFileUpload()"/>-->
-<!--      </label>-->
-<!--      <img v-bind:src="imagePreview" v-show="showPreview"/>-->
+      <div class="preview"></div>
 
       <div class="invalid-feedback" v-if="errors.text">
         {{ errors.text[0] }}
@@ -46,8 +43,9 @@ export default {
       },
       file: '',
       showPreview: false,
-      imagePreview: '',
+      imagePreview: [],
       files: [],
+      img: '',
       error: this.$route.query.error
     }
   },
@@ -66,26 +64,34 @@ export default {
         await this.$axios.post('/article/store', this.form, {})
       }
     },
-    // handleFileUpload() {
-    //   this.file = this.$refs.file.files[0];
-    //   let reader  = new FileReader();
-    //   reader.addEventListener("load", function () {
-    //     this.showPreview = true;
-    //     this.imagePreview = reader.result;
-    //   }.bind(this), false);
-    //   if( this.file ){
-    //     if ( /\.(jpe?g|png|gif)$/i.test( this.file.name ) ) {
-    //       reader.readAsDataURL( this.file );
-    //     }
-    //   }
-    // },
     handleFilesUpload() {
       let uploadedFiles = this.$refs.files.files;
-      for( var i = 0; i < uploadedFiles.length; i++ ){
-        this.files.push( uploadedFiles[i] );
+      let div = document.querySelector('.preview');
+
+      for( let i = 0; i < uploadedFiles.length; i++ ){
+
+        let reader = new FileReader();
+        reader.addEventListener("load", function () {
+          this.showPreview = true;
+          this.imagePreview.push(reader.result);
+          this.img = document.createElement('img');
+          this.img.setAttribute('src', this.imagePreview[i]);
+          div.append(this.img);
+        }.bind(this), false);
+
+        if( uploadedFiles[i] ){
+          if ( /\.(jpe?g|png|gif)$/i.test( uploadedFiles[i].name ) ) {
+            reader.readAsDataURL( uploadedFiles[i] );
+
+          }
+        }
+        this.imagePreview = [];
+        this.files.push(uploadedFiles[i]);
       }
     },
     removeFile( key ) {
+      let blockImg = document.querySelectorAll('.preview > img')
+      blockImg[key].remove()
       this.files.splice( key, 1 );
     }
   }
@@ -94,6 +100,7 @@ export default {
 
 <style scoped>
   img {
-    width: 240px;
+    width: 40px;
+    height: 40px;
   }
 </style>
