@@ -73,4 +73,6 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    'file_src' => public_path('assets/images/'),
+
 ];

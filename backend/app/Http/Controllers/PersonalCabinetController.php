@@ -24,11 +24,12 @@ class PersonalCabinetController
 
     protected Article $article;
     protected $profileId;
+    protected $auth;
 
-    public function __construct(Article $article, Request $request)
+    public function __construct(Article $article)
     {
         $this->article = $article;
-        $this->profileId = Profile::select('id')->where(['user_id' => 1])->limit(1)->get();
+        $this->profileId = Profile::select('id')->where(['user_id' => 1])->limit(1)->get()[0]->id;
     }
 
     public function getMyArticles(Request $request): AnonymousResourceCollection
@@ -39,7 +40,7 @@ class PersonalCabinetController
             }
         ])
             ->where(['status_id' => Article::ENTITY_STATUS_ACTIVE])
-            ->where(['author_id' => $this->profileId[0]->id])
+            ->where(['author_id' => $this->profileId])
             ->simplePaginate(10);
 
         return ArticleResource::collection($articles);
@@ -51,21 +52,18 @@ class PersonalCabinetController
 
         $this->article->title = $validatedData['title'];
         $this->article->description = $validatedData['description'];
-        $this->article->author_id = Auth::id();
+        $this->article->author_id = $this->profileId;
         $this->article->entity_type_id = self::ENTITY_TYPE;
         $this->article->category_id = self::CATEGORY;
         $this->article->status_id = Article::ENTITY_STATUS_UNDER_MODERATION;
 
         $lastId = Article::latest()->first()->id ?? 0;
         $currentId = $lastId + 1;
-        var_dump($request->get('description'));
-        var_dump($request->files->get('files'));
-
-//        UploadImagesService::save($request->files->get('files'), self::ENTITY_TYPE, $currentId);
 
         DB::beginTransaction();
 
         try {
+            UploadImagesService::save($request->files->get('files'), self::ENTITY_TYPE, $currentId);
             $this->article->save();
 
             $cat = [1,4,5];
