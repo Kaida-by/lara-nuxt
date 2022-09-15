@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 
+use App\Http\Controllers\CloudController;
 use App\Models\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Support\Str;
@@ -32,16 +33,19 @@ class UploadImagesService
             throw new \Exception('Valid File Format: jpeg, jpg, png');
         }
 
+        $cloud = new CloudController();
+        $newName = Str::uuid() . '.' . $uploadedFile->getClientOriginalExtension();
+
+        $uploadedFile->move(config('filesystems.file_src'), $newName);
+        $couldUrl = $cloud->store($uploadedFile, $newName);
+
         $image = new Image();
         $image->slug = self::getOriginalName($uploadedFile);
         $image->original_name = $uploadedFile->getClientOriginalName();
         $image->uuid = Str::uuid();
-        $image->src = self::getSrc($uploadedFile);
+        $image->src = $couldUrl;
         $image->entity_type_id = $entity_type;
         $image->entity_id = $entity_id;
-
-        $uploadedFile->move(config('filesystems.file_src'), $uploadedFile->getClientOriginalName());
-
         $image->save();
     }
 

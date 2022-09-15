@@ -63,7 +63,9 @@ class PersonalCabinetController
         DB::beginTransaction();
 
         try {
-            UploadImagesService::save($request->files->get('files'), self::ENTITY_TYPE, $currentId);
+            if ($request->files->get('files')) {
+                UploadImagesService::save($request->files->get('files'), self::ENTITY_TYPE, $currentId);
+            }
             $this->article->save();
 
             $cat = [1,4,5];

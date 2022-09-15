@@ -2,18 +2,20 @@
   <div class="container">
     <p>Create</p>
     <form @submit.prevent="create">
-      <label>Email: </label>
+      <label>Name: </label>
       <input v-model="form.title" type="text" name="name" :class="{ 'is-invalid': errors.title }" placeholder="title">
+      <label>Description: </label>
       <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">
 
-      <input type="file" id="files" ref="files" accept="image/*" @change="handleFilesUpload()" multiple>
-      <div class="large-12 medium-12 small-12 cell">
-        <div v-for="(file, key) in files" class="file-listing">{{ file.name }}
-          <span class="remove-file" v-on:click="removeFile( key )">Remove</span>
-        </div>
-      </div>
+      <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>
 
-      <div class="preview"></div>
+      <div class="preview">
+        <div class="img" v-for="(image, key) in files">
+          <img class="image_i" :src="image.src" alt="">
+          <span class="remove-file" v-on:click="removeFile( key )">✘</span>
+        </div>
+
+      </div>
 
       <div class="invalid-feedback" v-if="errors.text">
         {{ errors.text[0] }}
@@ -46,7 +48,13 @@ export default {
       imagePreview: [],
       files: [],
       img: '',
-      error: this.$route.query.error
+      error: this.$route.query.error,
+      newFiles: [],
+      newFile: {
+        name: undefined,
+        file: undefined,
+        src: undefined
+      }
     }
   },
   methods: {
@@ -54,7 +62,7 @@ export default {
       if (this.files.length > 0) {
         let form = new FormData();
         for( var i = 0; i < this.files.length; i++ ){
-          let file = this.files[i];
+          let file = this.files[i].file;
           form.append('files[' + i + ']', file)
           _.each(this.form, (value, key) => {
             form.append(key, value)});
@@ -64,34 +72,20 @@ export default {
         await this.$axios.post('/article/store', this.form, {})
       }
     },
-    handleFilesUpload() {
-      let uploadedFiles = this.$refs.files.files;
-      let div = document.querySelector('.preview');
+    handleImages(e) {
+      const files = e.target.files || e.dataTransfer.files
 
-      for( let i = 0; i < uploadedFiles.length; i++ ){
-
-        let reader = new FileReader();
-        reader.addEventListener("load", function () {
-          this.showPreview = true;
-          this.imagePreview.push(reader.result);
-          this.img = document.createElement('img');
-          this.img.setAttribute('src', this.imagePreview[i]);
-          div.append(this.img);
-        }.bind(this), false);
-
-        if( uploadedFiles[i] ){
-          if ( /\.(jpe?g|png|gif)$/i.test( uploadedFiles[i].name ) ) {
-            reader.readAsDataURL( uploadedFiles[i] );
-
-          }
+      for(let i = 0; i < files.length; i++) {
+        let reader = new FileReader()
+        reader.onload = (e) => {
+          this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
+          this.files.push(this.newFile)
         }
-        this.imagePreview = [];
-        this.files.push(uploadedFiles[i]);
+
+        reader.readAsDataURL(files[i])
       }
     },
     removeFile( key ) {
-      let blockImg = document.querySelectorAll('.preview > img')
-      blockImg[key].remove()
       this.files.splice( key, 1 );
     }
   }
@@ -99,5 +93,35 @@ export default {
 </script>
 
 <style scoped>
-
+  .preview {
+    display: flex;
+  }
+  .img {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .image_i {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+  .img span {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: white;
+    font-family: sans-serif;
+    padding: 3px 2px 4px 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
 </style>
