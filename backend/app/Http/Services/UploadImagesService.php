@@ -12,16 +12,16 @@ class UploadImagesService
 {
     public static function save(array $files, int $entity_type, int $entity_id): void
     {
-        foreach ($files as $file) {
+        foreach ($files as $key => $file) {
             try {
-                self::upload($file, $entity_type, $entity_id);
+                self::upload($file, $entity_type, $entity_id, $key + 1);
             } catch (\Exception $exception) {
                 dd($exception->getMessage());
             }
         }
     }
 
-    public static function upload(UploadedFile $uploadedFile, int $entity_type, int $entity_id): void
+    public static function upload(UploadedFile $uploadedFile, int $entity_type, int $entity_id, int $order): void
     {
         $permittedMimeTypes = ['image/jpeg', 'image/png'];
 
@@ -46,6 +46,7 @@ class UploadImagesService
         $image->src = $couldUrl;
         $image->entity_type_id = $entity_type;
         $image->entity_id = $entity_id;
+        $image->order = $order;
         $image->save();
     }
 

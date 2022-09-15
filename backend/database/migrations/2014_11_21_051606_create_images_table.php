@@ -20,6 +20,7 @@ class CreateImagesTable extends Migration
             $table->string('uuid');
             $table->string('src');
             $table->integer('is_main')->default(0);
+            $table->integer('order');
             $table->unsignedBigInteger('entity_type_id');
             $table->bigInteger('entity_id');
 

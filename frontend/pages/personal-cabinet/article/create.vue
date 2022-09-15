@@ -10,13 +10,14 @@
       <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>
 
       <div class="preview">
-        <div class="img" v-for="(image, key) in files">
-          <img class="image_i" :src="image.src" alt="">
-          <span class="remove-file" v-on:click="removeFile( key )">✘</span>
-        </div>
-
+        <draggable v-model="files" :animation="300" @start="drag=true" @end="drag=false">
+          <div class="img" v-for="(image, key) in files">
+            <img class="image_i" :src="image.src" alt="">
+            <span class="remove-file" v-on:click="removeFile( key )">✘</span>
+          </div>
+        </draggable>
       </div>
-
+<pre>{{ files }}</pre>
       <div class="invalid-feedback" v-if="errors.text">
         {{ errors.text[0] }}
       </div>
@@ -94,6 +95,9 @@ export default {
 
 <style scoped>
   .preview {
+    display: flex;
+  }
+  .preview > div {
     display: flex;
   }
   .img {
