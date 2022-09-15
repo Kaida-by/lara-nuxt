@@ -31,6 +31,7 @@ export default {
     './plugins/mixins/validation',
     './plugins/mixins/user',
     './plugins/axios',
+    './plugins/vuedraggable.js'
   ],
 
   env: {
