@@ -31,7 +31,8 @@ export default {
     './plugins/mixins/validation',
     './plugins/mixins/user',
     './plugins/axios',
-    './plugins/vuedraggable.js'
+    './plugins/vuedraggable.js',
+    './plugins/element-ui.js',
   ],
 
   env: {
@@ -53,6 +54,7 @@ export default {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
+    '@nuxtjs/tailwindcss',
   ],
 
   auth: {
