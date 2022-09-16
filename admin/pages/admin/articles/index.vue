@@ -1,54 +1,63 @@
 <template>
-  <div class="container">
+  <div class="w-full">
 
     <div class="page">
+
       <div class="left_area">
-        <div class="columns">
+        <div class="columns_categories">
           <div class="category" v-for="category in categories">
             <div class="title">{{ category.title }}</div>
             <div class="count_article">{{ category.cat }}</div>
           </div>
         </div>
       </div>
-      <div class="right_area">
-        <div class="articles">
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-            <tr class="article" v-for="article in articles">
-              <td><span>{{ article.title }}</span></td>
-              <td><span>{{ article.entityStatus.code }}</span></td>
-              <td class="actions">
-                <div class="edit">
-                  <nuxt-link :to="'/admin/articles/' + article.id">
-                    edit
-                  </nuxt-link>
-                </div>
-                <div class="delete">delete</div>
-              </td>
-            </tr>
-          </table>
-        </div>
 
-        <div class="btns">
+      <div class="right_area">
+        <el-table
+          stripe
+          :data="articles.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+          style="width: 100%">
+          <el-table-column label="Title" prop="title"></el-table-column>
+          <el-table-column label="Description" prop="description"></el-table-column>
+<!--          Search-->
+          <el-table-column
+            align="right">
+            <template slot="header" slot-scope="scope">
+              <el-input
+                v-model="search"
+                size="mini"
+                placeholder="Type to search"/>
+            </template>
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="warning">
+                <nuxt-link :to="'/admin/articles/' + articles[scope.$index].id">
+                  edit
+                </nuxt-link>
+              </el-button>
+              <el-button
+                size="mini"
+                type="danger">Delete</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="btns my-5">
           <div v-if="page > 1">
-            <button @click="prevPage">PREV</button>
+            <el-button @click="prevPage" round>prev</el-button>
           </div>
           <div v-else>
-            <button>PREV</button>
+            <el-button round>prev</el-button>
           </div>
           <div v-if="links.next !== null">
-            <button @click="nextPage">NEXT</button>
+            <el-button @click="nextPage" round>next</el-button>
           </div>
           <div v-else>
-            <button>NEXT</button>
+            <el-button round>next</el-button>
           </div>
         </div>
-
       </div>
+
     </div>
   </div>
 </template>
@@ -61,7 +70,8 @@ export default {
       page: 1,
       articles: [],
       categories: [],
-      links: {}
+      links: {},
+      search: '',
     }
   },
   methods: {
@@ -97,81 +107,50 @@ export default {
 </script>
 
 <style scoped>
-  .articles {
-    margin-bottom: 20px;
+  .category {
+    display: flex;
+    padding: 8px 12px;
+    justify-content: space-between;
+    cursor: pointer;
   }
-  .article h3, .article p {
-    margin: 0;
+  .category:hover {
+    @apply bg-slate-400
+  }
+  .category .title {
+    font-size: 14px;
+    line-height: 23px;
+    color: #222222;
+  }
+  .count_article {
+    color: #222222;
+    font-size: 12px;
   }
   .btns {
     display: flex;
+    gap: 4px;
+    justify-content: center;
   }
   .page {
     display: flex;
     width: 100%;
-    height: 100vh;
+    border-bottom: 1px solid #FAFAFA;
+    background-color: #EBEEF5;
   }
   .left_area {
-    background-color: #a0aec0;
-    width: 17%;
+    width: 12%;
     height: 100%;
   }
   .right_area {
-    background-color: #bbc2cb;
-    width: 83%;
+    width: 88%;
     height: 100%;
     position: relative;
-  }
-  .articles {
-    width: 100%;
+    border-left: 1px solid #FAFAFA;
   }
   .btns {
     height: fit-content;
     justify-content: center;
   }
-  table {
-    width: 100%;
-  }
-  tr th, tr td {
-    text-align: left;
-  }
-  table, th, td {
-    border: 1px solid transparent;
-    border-collapse: collapse;
-  }
-  table tr {
-    background-color: #767676;
-  }
-  table tr:nth-child(2n) {
-    background-color: #ededed;
-  }
-  table tr:first-child {
-    background-color: #fff;
-  }
-  .actions {
-    display: flex;
-    justify-content: left;
-  }
-  .actions .edit {
-    display: block;
-    background-color: orange;
-    padding: 10px;
-    border-radius: 5px;
-    margin-right: 5px;
-  }
-  .actions .edit a {
-    text-decoration: unset;
-    color: black;
-  }
-  .actions .delete {
-    display: block;
-    background-color: #d50505;
-    padding: 10px;
-    border-radius: 5px;
-    margin-left: 5px;
-  }
-  .category {
-    display: flex;
-    justify-content: space-between;
-  }
+  /*.el-table ::v-deep .el-table__row {*/
+  /*  @apply bg-gray-300;*/
+  /*}*/
 </style>

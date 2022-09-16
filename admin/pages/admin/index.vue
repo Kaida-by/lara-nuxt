@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="mx-auto align-middle flex w-100">
     <center-nav></center-nav>
   </div>
 </template>
@@ -21,7 +21,6 @@ export default {
   .container {
     display: flex;
     width: 100%;
-    height: 100vh;
   }
   .center_area {
     background-color: #a0aec0;

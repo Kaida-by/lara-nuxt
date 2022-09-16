@@ -1,14 +1,14 @@
 <template>
-  <div class="container header-container">
+  <div class="container header-container mx-auto align-middle flex w-100 mb-6">
     <div class="header_flex">
       <div class="logo">
-<!--        <nuxt-link to="/">Admin</nuxt-link>-->
+        Logo
       </div>
       <div class="header-sdk" v-if="$auth.loggedIn">
-        <div>
-          {{ $auth.user.name }}
+        <div class="py-2">
+          Hello, {{ $auth.user.name }}
         </div>
-        <div @click.prevent="logOut">logout</div>
+        <el-button type="info" plain @click.prevent="logOut">logout</el-button>
       </div>
     </div>
   </div>
