@@ -17,7 +17,6 @@
           </div>
         </draggable>
       </div>
-<pre>{{ files }}</pre>
       <div class="invalid-feedback" v-if="errors.text">
         {{ errors.text[0] }}
       </div>
