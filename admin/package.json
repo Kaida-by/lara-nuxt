@@ -15,6 +15,7 @@
     "bootstrap": "^5.2.0",
     "bootstrap-vue": "^2.22.0",
     "core-js": "^3.19.3",
+    "element-ui": "^2.15.10",
     "laravel-vue-pagination": "^3.0.0",
     "nuxt": "^2.15.8",
     "vue": "^2.7.10",
@@ -23,6 +24,7 @@
     "webpack": "^4.46.0"
   },
   "devDependencies": {
+    "@nuxtjs/tailwindcss": "^5.3.3",
     "husky": "^8.0.1",
     "sass": "^1.54.5",
     "sass-loader": "^10.3.1"

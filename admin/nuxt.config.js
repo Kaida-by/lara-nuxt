@@ -34,6 +34,7 @@ export default {
     './plugins/mixins/validation',
     './plugins/mixins/user',
     './plugins/axios',
+    './plugins/element-ui.js',
   ],
 
   env: {
@@ -55,6 +56,7 @@ export default {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
+    '@nuxtjs/tailwindcss',
   ],
 
   auth: {
