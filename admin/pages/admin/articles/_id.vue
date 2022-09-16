@@ -1,6 +1,27 @@
 <template>
-  <div class="container">
+  <div class="container mx-auto w-100">
     <div class="article">
+      <div class="art_profile">
+        <el-row>
+          <el-col>Profile:</el-col>
+        </el-row>
+        <el-row>
+          <el-col>avatar</el-col>
+          <el-col>img</el-col>
+        </el-row>
+<!--        <el-row>-->
+<!--          <el-col>First name</el-col>-->
+<!--          <el-col>{{ article.user.profile.name }}</el-col>-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <el-col>Surname</el-col>-->
+<!--          <el-col>{{ article.user.profile.surname }}</el-col>-->
+<!--        </el-row>-->
+<!--        <el-row>-->
+<!--          <el-col>Patronymic</el-col>-->
+<!--          <el-col>{{ article.user.profile.patronymic }}</el-col>-->
+<!--        </el-row>-->
+      </div>
       <h2>{{ article.title }}</h2>
       <p>{{ article.description }}</p>
     </div>

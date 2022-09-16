@@ -5,7 +5,9 @@
 <script>
 export default {
   name: "index",
-  // middleware: 'auth'
+  mounted() {
+    this.$router.push({path: '/login'});
+  }
 }
 </script>
 
