@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\admin\article;
 
 use App\Http\Requests\AdminArticleRequest;
-use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
+use App\Models\Image;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
@@ -86,5 +87,57 @@ class AdminArticleController
         $article->status_id = $request['checked'] == false ? 2 : 1;
 
         $article->update();
+    }
+
+    public function delete(int $id): JsonResponse
+    {
+        $article = Article::with([
+            'images',
+        ])
+            ->where(['id' => $id])
+            ->limit(1)
+            ->get();
+
+        DB::beginTransaction();
+
+        try {
+            if (isset($article[0]) && $article[0]->images instanceof Collection) {
+                foreach ($article[0]->images as $image) {
+                    $image = Image::find($image['id']);
+
+                    if ($image['is_local'] === 1) {
+                        unlink($image['src']);
+                    }
+
+                    Image::destroy(['id' => $image['id']]);
+                }
+                Article::destroy($id);
+                DB::commit();
+
+                return \response()->json([
+                    'success' => true,
+                ], 204);
+            } else {
+                return \response()->json([
+                    'success' => false,
+                    'errors' => [
+                        'text' => [
+                            'Something went wrong.'
+                        ]
+                    ]
+                ], 500);
+            }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+
+            return \response()->json([
+                'success' => false,
+                'errors' => [
+                    'text' => [
+                        $exception
+                    ]
+                ]
+            ], 500);
+        }
     }
 }

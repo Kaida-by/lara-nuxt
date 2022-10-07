@@ -48,10 +48,6 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::patch('/article/{id}', [PersonalCabinetController::class, 'update'])->name('article.update');
     Route::get('/article/edit/{id}' ,[PersonalCabinetController::class, 'edit'])->name('article.edit');
     Route::post('article/store', [PersonalCabinetController::class, 'store'])->name('article.store');
-
-    //articles
-//    Route::get('article/{id}', [ArticleController::class, 'show'])->name('article.show');
-//    Route::delete('article/{id}', [ArticleController::class, 'destroy'])->name('article.delete');
 });
 
 Route::group(['prefix' => '/admin'], function () {
@@ -60,5 +56,6 @@ Route::group(['prefix' => '/admin'], function () {
     Route::get('/articles', [AdminArticleController::class, 'showAll'])->name('admin.articles.index');
     Route::get('/article/edit/{id}' ,[AdminArticleController::class, 'edit'])->name('admin.article.edit');
     Route::patch('/article/approve/{id}' ,[AdminArticleController::class, 'approve'])->name('admin.article.approve');
+    Route::delete('/article/delete/{id}' ,[AdminArticleController::class, 'delete'])->name('admin.article.delete');
     Route::get('/article-categories', [AdminArticleController::class, 'getCategories'])->name('article-categories.index');
 });

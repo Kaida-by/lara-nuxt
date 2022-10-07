@@ -29,16 +29,14 @@
                 placeholder="Type to search"/>
             </template>
             <template slot-scope="scope">
+              <nuxt-link :to="'/admin/articles/' + articles[scope.$index].id">
+                <el-button
+                  size="mini"
+                  type="warning">edit</el-button>
+              </nuxt-link>
               <el-button
                 size="mini"
-                type="warning">
-                <nuxt-link :to="'/admin/articles/' + articles[scope.$index].id">
-                  edit
-                </nuxt-link>
-              </el-button>
-              <el-button
-                size="mini"
-                type="danger">Delete</el-button>
+                type="danger" @click="deleteArticle(articles[scope.$index].id)">Delete</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -97,6 +95,17 @@ export default {
           this.categories = res.data.categories
         })
         .catch(err => console.log(err))
+    },
+    deleteArticle(id) {
+      if (confirm("Do you really want to delete this Article?")) {
+        try {
+          this.$axios.delete('/admin/article/delete/' + id).then(response => {
+            this.fetchData();
+          });
+        } catch(e) {
+          return;
+        }
+      }
     }
   },
   mounted () {

@@ -10,18 +10,25 @@ use Illuminate\Support\Str;
 
 class UploadImagesService
 {
-    public static function save(array $files, int $entity_type, int $entity_id): void
+    public static function save(array $files, int $entity_type, int $entity_id, bool $is_local = true): void
     {
         foreach ($files as $key => $file) {
             try {
-                self::upload($file, $entity_type, $entity_id, $key + 1);
+                self::upload($file, $entity_type, $entity_id, $key + 1, $is_local);
             } catch (\Exception $exception) {
                 dd($exception->getMessage());
             }
         }
     }
 
-    public static function upload(UploadedFile $uploadedFile, int $entity_type, int $entity_id, int $order): void
+    public static function upload
+    (
+        UploadedFile $uploadedFile,
+        int $entity_type,
+        int $entity_id,
+        int $order,
+        bool $is_local = true
+    ): void
     {
         $permittedMimeTypes = ['image/jpeg', 'image/png'];
 
@@ -33,20 +40,26 @@ class UploadImagesService
             throw new \Exception('Valid File Format: jpeg, jpg, png');
         }
 
-        $cloud = new CloudController();
         $newName = Str::uuid() . '.' . $uploadedFile->getClientOriginalExtension();
 
         $uploadedFile->move(config('filesystems.file_src'), $newName);
-        $couldUrl = $cloud->store($uploadedFile, $newName);
+
+        if (!$is_local) {
+            $cloud = new CloudController();
+            $url = $cloud->store($uploadedFile, $newName);
+        } else {
+            $url = config('filesystems.file_src') . $newName;
+        }
 
         $image = new Image();
         $image->slug = self::getOriginalName($uploadedFile);
         $image->original_name = $uploadedFile->getClientOriginalName();
         $image->uuid = Str::uuid();
-        $image->src = $couldUrl;
+        $image->src = $url;
         $image->entity_type_id = $entity_type;
         $image->entity_id = $entity_id;
         $image->order = $order;
+        $image->is_local = $is_local ? 1 : 0;
         $image->save();
     }
 

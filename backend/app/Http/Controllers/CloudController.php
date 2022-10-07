@@ -24,8 +24,6 @@ class CloudController extends Controller
 
         unlink(public_path('assets/images/' . $newName));
 
-//        Storage::delete(public_path('assets/images/' . $newName));
-
         return "https://storage.googleapis.com/$bucketName/$newName";
     }
 }
