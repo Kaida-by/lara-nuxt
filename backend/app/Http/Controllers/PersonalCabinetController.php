@@ -57,20 +57,26 @@ class PersonalCabinetController
         $this->article->category_id = self::CATEGORY;
         $this->article->status_id = Article::ENTITY_STATUS_UNDER_MODERATION;
 
-        $lastId = Article::latest()->first()->id ?? 0;
-        $currentId = $lastId + 1;
-
         DB::beginTransaction();
 
         try {
-            if ($request->files->get('files')) {
-                UploadImagesService::save($request->files->get('files'), self::ENTITY_TYPE, $currentId);
-            }
+
             $this->article->save();
 
-            $cat = [1,4,5];
-            $c = Category::find($cat);
-            $this->article->categories()->attach($c);
+            $currentId = Article::latest()->first()->id ?? 0;
+
+            if ($request->files->get('files')) {
+                UploadImagesService::save(
+                    $request->files->get('files'),
+                    self::ENTITY_TYPE,
+                    $currentId,
+                    false
+                );
+            }
+
+//            $cat = [1,4,5];
+//            $c = Category::find($cat);
+//            $this->article->categories()->attach($c);
 
             DB::commit();
 
@@ -106,7 +112,7 @@ class PersonalCabinetController
             'images'
         ])
             ->where(['id' => $id])
-            ->where(['author_id' => $this->profileId[0]->id])
+//            ->where(['author_id' => $this->profileId[0]->id])
             ->get();
 
         if (count($article) > 0) {
