@@ -26,6 +26,7 @@
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^5.3.3",
     "husky": "^8.0.1",
+    "nuxt-meilisearch": "^0.1.1",
     "sass": "^1.54.5",
     "sass-loader": "^10.3.1"
   }
