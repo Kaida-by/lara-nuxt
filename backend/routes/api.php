@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\article\AdminArticleController;
+use App\Http\Controllers\admin\article\ArticleSearchController;
 use App\Http\Controllers\api\Auth\LoginAdminController;
 use App\Http\Controllers\api\Auth\LoginController;
 use App\Http\Controllers\api\Auth\RegisterController;
@@ -52,6 +53,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 
 Route::group(['prefix' => '/admin'], function () {
     Route::post('login', [LoginAdminController::class, 'login']);
+
+    // Search
+    Route::get('/article/search', [ArticleSearchController::class, 'search']);
 
     Route::get('/articles', [AdminArticleController::class, 'showAll'])->name('admin.articles.index');
     Route::get('/article/edit/{id}' ,[AdminArticleController::class, 'edit'])->name('admin.article.edit');

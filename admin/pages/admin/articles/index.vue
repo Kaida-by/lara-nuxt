@@ -24,9 +24,10 @@
             align="right">
             <template slot="header" slot-scope="scope">
               <el-input
-                v-model="search"
+                v-model="searchInput"
+                @input="searching" autocomplete="off"
                 size="mini"
-                placeholder="Type to search"/>
+                placeholder="Type something..."/>
             </template>
             <template slot-scope="scope">
               <nuxt-link :to="'/admin/articles/' + articles[scope.$index].id">
@@ -61,6 +62,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "index",
   data () {
@@ -70,9 +73,32 @@ export default {
       categories: [],
       links: {},
       search: '',
+      searchInput: '',
     }
   },
   methods: {
+    async searching() {
+      if (this.searchInput.length > 2) {
+        await this.$axios.get('/admin/article/search', {
+          params: {
+            query: this.searchInput
+          }
+        })
+          .then(response => {
+            this.articles = response.data.data;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else {
+        await this.$axios.get('/admin/articles?page=' + this.page)
+          .then((res) => {
+            this.articles = res.data.data
+            this.links = res.data.links
+          })
+          .catch(err => console.log(err))
+      }
+    },
     async fetchData() {
       await this.$axios.get('/admin/articles?page=' + this.page)
         .then((res) => {
