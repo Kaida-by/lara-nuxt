@@ -2,6 +2,8 @@ export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
+  target: 'static',
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'frontend',
@@ -96,6 +98,13 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  vue: {
+    config: {
+      devtools: true,
+      productionTip: false,
+    },
+  },
 
   server: {
     host: '0.0.0.0',

@@ -67,10 +67,11 @@ class PersonalCabinetController
 
             if ($request->files->get('files')) {
                 UploadImagesService::save(
-                    $request->files->get('files'),
                     self::ENTITY_TYPE,
                     $currentId,
-                    false
+                    $request->files->get('files'),
+                    true,
+                    true
                 );
             }
 
@@ -91,7 +92,7 @@ class PersonalCabinetController
                 'success' => false,
                 'errors' => [
                     'text' => [
-                        $exception
+                        $exception->getMessage()
                     ]
                 ]
             ], 500);
@@ -112,7 +113,6 @@ class PersonalCabinetController
             'images'
         ])
             ->where(['id' => $id])
-//            ->where(['author_id' => $this->profileId[0]->id])
             ->get();
 
         if (count($article) > 0) {
@@ -130,17 +130,37 @@ class PersonalCabinetController
 
     public function update(ArticleRequest $request, $id): JsonResponse
     {
-        $article = Article::find($id);
-        $article->title = $request['title'];
-        $article->description = $request['description'];
+        try {
+            $article = Article::find($id);
+            $article->title = $request['title'];
+            $article->description = $request['description'];
 
-//        UploadImagesService::update(self::ENTITY_TYPE, $id, $request['is_main_image']);
+            DB::beginTransaction();
 
-        $article->update();
+            if ($request->files->get('files')) {
+                UploadImagesService::save(
+                    self::ENTITY_TYPE,
+                    $id,
+                    $request->files->get('files'),
+                    true,
+                    false,
+                );
+            }
 
-        return \response()->json([
-            'success' => true,
-            'data' => $article
-        ], 200);
+            $article->update();
+            DB::commit();
+
+            return \response()->json([
+                'success' => true,
+                'data' => $request->files->get('files')
+            ], 200);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+
+            return \response()->json([
+                'success' => true,
+                'data' => $exception->getMessage()
+            ], 200);
+        }
     }
 }
