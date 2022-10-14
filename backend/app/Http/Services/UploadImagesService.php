@@ -4,17 +4,24 @@ namespace App\Http\Services;
 
 
 use App\Http\Controllers\CloudController;
+use App\Models\Article;
 use App\Models\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Support\Str;
 
 class UploadImagesService
 {
-    public static function save(array $files, int $entity_type, int $entity_id, bool $is_local = true): void
+    public static function save(
+        int $entity_type,
+        int $entity_id,
+        array $files = [],
+        bool $is_local = true,
+        bool $is_new = true,
+    ): void
     {
         foreach ($files as $key => $file) {
             try {
-                self::upload($file, $entity_type, $entity_id, $key + 1, $is_local);
+                self::upload($file, $entity_type, $entity_id, $key + 1, $is_local, $is_new);
             } catch (\Exception $exception) {
                 dd($exception->getMessage());
             }
@@ -27,9 +34,21 @@ class UploadImagesService
         int $entity_type,
         int $entity_id,
         int $order,
-        bool $is_local = true
-    ): void
+        bool $is_local,
+        bool $is_new,
+    )
     {
+        if (!$is_new) {
+            $imageIds = Article::with(['images'])
+                ->where(['id' => $entity_id])
+                ->get();
+
+            foreach ($imageIds[0]->images as $image) {
+                unlink(public_path() . '/../' . $image['src']);
+                Image::destroy(['id' => $image['id']]);
+            }
+        }
+
         $permittedMimeTypes = ['image/jpeg', 'image/png'];
 
         if ($uploadedFile->getSize() > 10000000) {
@@ -48,7 +67,7 @@ class UploadImagesService
             $cloud = new CloudController();
             $url = $cloud->store($uploadedFile, $newName);
         } else {
-            $url = config('filesystems.file_src') . $newName;
+            $url = config('filesystems.file_src_image_path') . $newName;
         }
 
         $image = new Image();
@@ -82,8 +101,13 @@ class UploadImagesService
         return "{$publicPath}{$fileName}";
     }
 
-    public static function update(int $entity_type, int $entity_id, string $newMainImageUuid)
+    public static function update(array $files, int $entity_type, int $entity_id, string $newMainImageUuid)
     {
+        return \response()->json([
+            'success' => true,
+            'data' => $files
+        ], 200);
+
         $oldImageMain = Image::where('entity_type_id', $entity_type)
             ->where('entity_id', $entity_id)
             ->where('is_main', 1)

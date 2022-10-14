@@ -106,7 +106,7 @@ class AdminArticleController
                     $image = Image::find($image['id']);
 
                     if ($image['is_local'] === 1) {
-                        unlink($image['src']);
+                        unlink(public_path() . '/../' . $image['src']);
                     }
 
                     Image::destroy(['id' => $image['id']]);
@@ -134,7 +134,7 @@ class AdminArticleController
                 'success' => false,
                 'errors' => [
                     'text' => [
-                        $exception
+                        $exception->getMessage()
                     ]
                 ]
             ], 500);
