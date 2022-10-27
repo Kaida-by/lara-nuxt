@@ -37,6 +37,7 @@ Route::group(['prefix' => '/auth'], function () {
 });
 
 Route::get('/articles', [ArticleController::class, 'showAll'])->name('articles.index');
+Route::get('/article/{article}' ,[ArticleController::class, 'showOne'])->name('article.showOne');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/me', [MeController::class, 'index']);

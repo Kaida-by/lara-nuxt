@@ -79,7 +79,7 @@ class AdminArticleController
         return \response()->json([
             'success' => true,
             'data' => $article
-        ], 200);
+        ]);
     }
 
     public function approve(int $id, AdminArticleRequest $request)

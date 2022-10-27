@@ -22,6 +22,7 @@ class ArticleResource extends JsonResource
             'status_id' => $this->resource->status_id,
             'images' => $this->resource->images,
             'entityStatus' => $this->resource->entityStatus,
+            'created_at' => $this->resource->created_at->format('d M H:i'),
         ];
     }
 }
