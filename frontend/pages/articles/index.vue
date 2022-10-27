@@ -2,22 +2,40 @@
   <div class="container">
     <div class="articles">
       <div class="article" v-for="article in articles">
-        <h2>{{ article.title }}</h2>
-        <p>{{ article.description }}</p>
+        <nuxt-link v-if="article.images[0]" :to="'/articles/' + article.id">
+          <div class="item">
+            <div class="date">{{ article.created_at }}</div>
+            <img class="item_img" :src="article.images[0].src" alt="">
+            <h2 v-if="article.title.length > 30">{{ article.title.substr(0, 33) }} ...</h2>
+            <h2 v-else>{{ article.title }}</h2>
+            <p v-if="article.description.length > 67">{{ article.description.substr(0, 70) }} ...</p>
+            <p v-else>{{ article.description }}</p>
+          </div>
+        </nuxt-link>
+        <nuxt-link v-else :to="'/articles/' + article.id">
+          <div class="item">
+            <div class="date">{{ article.created_at }}</div>
+            <img class="item_img" src="/public/assets/images/lg.jpg" alt="">
+            <h2 v-if="article.title.length > 30">{{ article.title.substr(0, 33) }} ...</h2>
+            <h2 v-else>{{ article.title }}</h2>
+            <p v-if="article.description.length > 67">{{ article.description.substr(0, 70) }} ...</p>
+            <p v-else>{{ article.description }}</p>
+          </div>
+        </nuxt-link>
       </div>
     </div>
-    <div class="btns">
+    <div class="btns my-5">
       <div v-if="page > 1">
-        <button @click="prevPage">PREV</button>
+        <el-button @click="prevPage" round>prev</el-button>
       </div>
       <div v-else>
-        <button>PREV</button>
+        <el-button round>prev</el-button>
       </div>
       <div v-if="links.next !== null">
-        <button @click="nextPage">NEXT</button>
+        <el-button @click="nextPage" round>next</el-button>
       </div>
       <div v-else>
-        <button>NEXT</button>
+        <el-button round>next</el-button>
       </div>
     </div>
   </div>
@@ -68,11 +86,48 @@ export default {
   }
   .articles {
     margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
   }
   .article h2, .article p {
     margin: 3px 0;
   }
   .btns {
     display: flex;
+    gap: 4px;
+    justify-content: center;
+    height: fit-content;
+  }
+  .item_img {
+    height: 300px;
+    object-fit: cover;
+  }
+  .item {
+    position: relative;
+    height: 420px;
+    background-color: white;
+    overflow: hidden;
+  }
+  .item img {
+    margin-bottom: 15px;
+  }
+  .item h2,
+  .item p {
+    padding: 0 15px;
+  }
+  .item h2 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .item .date {
+    position: absolute;
+    background-color: white;
+    opacity: 0.7;
+    top: 7px;
+    left: 7px;
+    width: fit-content;
+    border-radius: 15px;
+    padding: 0 6px;
   }
 </style>

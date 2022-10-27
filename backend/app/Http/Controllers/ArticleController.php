@@ -16,6 +16,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use function Clue\StreamFilter\fun;
 
 class ArticleController
 {
@@ -37,27 +38,38 @@ class ArticleController
             }
         ])
             ->where(['status_id' => Article::ENTITY_STATUS_ACTIVE])
-            ->simplePaginate(10);
+            ->orderBy('created_at', 'DESC')
+            ->simplePaginate(4);
 
         return ArticleResource::collection($articles);
     }
 
-    public function show(Article $article): Response
+    public function showOne(Article $article): JsonResponse
     {
-        return response([
-            'article' => $article,
+        $article = Article::with([
+            'user' => function($q) {
+                $q->with([
+                    'profile' => function ($p) {
+                        $p->with([
+                            'images' => function ($pi) {
+                                $pi->where(['entity_type_id' => 3]);
+                            }
+                        ]);
+                    }
+                ]);
+            },
+            'entityStatus',
+            'images' => function($q) {
+                $q->where(['entity_type_id' => self::ENTITY_TYPE]);
+                $q->orderBy('order');
+            }
+        ])
+            ->where(['id' => $article->id])
+            ->get();
+
+        return \response()->json([
+            'success' => true,
+            'data' => $article
         ]);
-    }
-
-
-    public function destroy($id): RedirectResponse
-    {
-        Article::where('id', $id)->delete();
-
-        Image::where('entity_type_id', self::ENTITY_TYPE)
-            ->where('entity_id', $id)
-            ->delete();
-
-        return redirect()->route('article.index');
     }
 }

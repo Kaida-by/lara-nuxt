@@ -51,6 +51,8 @@ export default {
   .header-container {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
   }
   .header_flex {
     display: flex;

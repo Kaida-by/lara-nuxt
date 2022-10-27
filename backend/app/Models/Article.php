@@ -19,6 +19,10 @@ class Article extends Model implements EntityInterface
         'description',
     ];
 
+    protected $dates = [
+        'created_at'
+    ];
+
     public function images(): HasMany
     {
         return $this->hasMany(Image::class, 'entity_id');
