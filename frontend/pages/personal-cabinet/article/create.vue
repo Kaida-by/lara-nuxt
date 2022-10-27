@@ -59,18 +59,20 @@ export default {
   },
   methods: {
     async create() {
-      if (this.files.length > 0) {
-        let form = new FormData();
-        for( var i = 0; i < this.files.length; i++ ){
-          let file = this.files[i].file;
-          form.append('files[' + i + ']', file)
-          _.each(this.form, (value, key) => {
-            form.append(key, value)});
-        }
-        await this.$axios.post('/article/store', form, {})
-      } else {
-        await this.$axios.post('/article/store', this.form, {})
+      // if (this.files.length > 0) {
+      let form = new FormData();
+      for ( var i = 0; i < this.files.length; i++ ) {
+        let file = this.files[i].file;
+        form.append('files[' + i + ']', file)
       }
+      _.each(this.form, (value, key) => {
+        form.append(key, value)
+      });
+      // } else {
+      //   await this.$axios.post('/article/store', this.form, {})
+      // }
+
+      await this.$axios.post('/article/store', form, {})
     },
     handleImages(e) {
       const files = e.target.files || e.dataTransfer.files

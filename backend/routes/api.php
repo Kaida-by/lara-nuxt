@@ -37,9 +37,7 @@ Route::group(['prefix' => '/auth'], function () {
 });
 
 Route::get('/articles', [ArticleController::class, 'showAll'])->name('articles.index');
-Route::patch('/article/{id}', [PersonalCabinetController::class, 'update'])->name('article.update');
-Route::get('/article/edit/{id}' ,[PersonalCabinetController::class, 'edit'])->name('article.edit');
-Route::post('article/store', [PersonalCabinetController::class, 'store'])->name('article.store');
+
 Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/me', [MeController::class, 'index']);
     Route::get('/auth/logout', [MeController::class, 'logout']);
@@ -48,9 +46,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/personal-cabinet', [MeController::class, 'logout']);
     Route::get('/my-articles', [PersonalCabinetController::class, 'getMyArticles'])->name('pc.articles.index');
     Route::get('/article/create/', [PersonalCabinetController::class, 'create'])->name('articles.create');
-//    Route::patch('/article/{id}', [PersonalCabinetController::class, 'update'])->name('article.update');
-//    Route::get('/article/edit/{id}' ,[PersonalCabinetController::class, 'edit'])->name('article.edit');
-//    Route::post('article/store', [PersonalCabinetController::class, 'store'])->name('article.store');
+    Route::get('/article/edit/{id}' ,[PersonalCabinetController::class, 'edit'])->name('article.edit');
+    Route::post('/article/store', [PersonalCabinetController::class, 'store'])->name('article.store');
+    Route::post('/article/{article}', [PersonalCabinetController::class, 'update'])->name('article.update');
 });
 
 Route::group(['prefix' => '/admin'], function () {

@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.0.2",
         "algolia/algoliasearch-client-php": "^3.3",
+        "barryvdh/laravel-ide-helper": "^2.12",
         "fruitcake/laravel-cors": "^3.0",
         "google/cloud-storage": "^1.28",
         "guzzlehttp/guzzle": "^7.5",

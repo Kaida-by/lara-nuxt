@@ -4,36 +4,20 @@
       <form @submit.prevent="update">
 
         <label>Title: </label>
-        <input
-          v-model="article.title"
-          type="text"
-          name="title"
-          :class="{ 'is-invalid': errors.text }"
-          placeholder="title"
-        >
-        <div class="invalid-feedback" v-if="errors.title">
-          {{ errors.title[0] }}
-        </div>
+        <input v-model="form.title" type="text" name="title" :class="{ 'is-invalid': errors.text }" placeholder="title">
+        <div class="invalid-feedback" v-if="errors.title">{{ errors.title[0] }}</div>
 
         <label>Description: </label>
-        <input
-          v-model="article.description"
-          type="text"
-          name="description"
-          :class="{ 'is-invalid': errors.description }"
-          placeholder="description"
-        >
-        <div class="invalid-feedback" v-if="errors.description">
-          {{ errors.description[0] }}
-        </div>
+        <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">
+        <div class="invalid-feedback" v-if="errors.description">{{ errors.description[0] }}</div>
 
         <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>
 
-        <div class="images" @change="handleImages($event)">
+        <div class="images">
           <span>Images:</span>
           <div class="preview">
-            <draggable v-model="files" :animation="300" @start="drag=true" @end="drag=false">
-              <div class="img" v-for="(image, key) in files">
+            <draggable v-model="form.images" :animation="300" @start="drag=true" @end="drag=false">
+              <div class="img" v-for="(image, key) in form.images">
                 <img class="image_i" :src="image.src" alt="">
                 <span class="remove-file" v-on:click="removeFile( key )">✘</span>
               </div>
@@ -51,12 +35,19 @@
 </template>
 
 <script>
+import _ from "lodash";
+
 export default {
-  name: "_id",
+  // name: "article",
   data() {
     return {
-      article: [],
-      files: [],
+      form: {
+        title: '',
+        description: '',
+        images: [],
+      },
+      newFile: {},
+      file: '',
       error: this.$route.query.error,
     }
   },
@@ -64,21 +55,43 @@ export default {
     async fetchData() {
       await this.$axios.get('/article/edit/' + this.$route.params.id)
         .then((res) => {
-          this.article = res.data.data[0]
-          this.files = res.data.data[0].images
+          const article = res.data.data[0]
+
+          for (let key in this.form) {
+              this.form[key] = article[key]
+          }
         })
         .catch(err => console.log(err))
     },
     async update() {
-      this.article.images = this.files;
-
       try {
-        await this.$axios.patch('/article/' + this.$route.params.id, this.article);
+        let form = new FormData();
+        _.each(this.form, (value, key) => {
+          if (key === 'images') {
+            for (var i = 0; i < this.form.images.length; i++) {
+              let file = this.form.images[i].file;
+              if (file) {
+                form.append('images[' + i + ']', file)
+              } else {
+                form.append('images[' + i + ']', JSON.stringify(this.form.images[i]))
+              }
+            }
+          } else {
+            form.append(key, value)
+          }
+        });
+
+        // _.each(this.form, (value, key) => {
+        //   form.append(key, value)
+        // });
+
+        // for (let value of form.values()) {
+        //   console.log(value);
+        // }
+        await this.$axios.post('/article/' + this.$route.params.id, form, {})
       } catch(e) {
         return;
       }
-
-      // this.$router.push({name: 'admin'});
     },
     handleImages(e) {
       const files = e.target.files || e.dataTransfer.files
@@ -86,14 +99,13 @@ export default {
         let reader = new FileReader()
         reader.onload = (e) => {
           this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
-          this.files.push(this.newFile)
+          this.form.images.push(this.newFile)
         }
-
         reader.readAsDataURL(files[i])
       }
     },
     removeFile( key ) {
-      this.files.splice( key, 1 );
+      this.form.images.splice( key, 1 );
     }
   },
   mounted () {
