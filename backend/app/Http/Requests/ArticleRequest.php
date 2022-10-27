@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property mixed images
+ */
 class ArticleRequest extends FormRequest
 {
     /**
@@ -26,6 +29,11 @@ class ArticleRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:255',
+//            'images' => 'sometimes|array',
+//            'images.*' => 'required|array',
+//            'images.*.id' => 'required_without:images.*.name,images.*.src|integer',
+//            'images.*.name' => 'required_without:images.*.id|string',
+//            'images.*.src' => 'required_without:images.*.id|string',
         ];
     }
 

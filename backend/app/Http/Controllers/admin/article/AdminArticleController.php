@@ -69,7 +69,9 @@ class AdminArticleController
                 $q->with(['profile']);
             },
             'entityStatus',
-            'images'
+            'images' => function($q) {
+                $q->orderBy('order');
+            }
         ])
             ->where(['id' => $id])
             ->get();

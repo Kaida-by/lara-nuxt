@@ -6,16 +6,13 @@ use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Services\UploadImagesService;
 use App\Models\Article;
-use App\Models\Category;
 use App\Models\Profile;
-use App\Models\User;
+use Throwable;
+use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use function response;
 
 class PersonalCabinetController
 {
@@ -32,7 +29,7 @@ class PersonalCabinetController
         $this->profileId = Profile::select('id')->where(['user_id' => 1])->limit(1)->get()[0]->id;
     }
 
-    public function getMyArticles(Request $request): AnonymousResourceCollection
+    public function getMyArticles(): AnonymousResourceCollection
     {
         $articles = Article::with([
             'images' => function($q) {
@@ -46,7 +43,7 @@ class PersonalCabinetController
         return ArticleResource::collection($articles);
     }
 
-    public function store(ArticleRequest $request)
+    public function store(ArticleRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -57,7 +54,11 @@ class PersonalCabinetController
         $this->article->category_id = self::CATEGORY;
         $this->article->status_id = Article::ENTITY_STATUS_UNDER_MODERATION;
 
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
+        } catch (Throwable $e) {
+            dd($e);
+        }
 
         try {
 
@@ -71,24 +72,19 @@ class PersonalCabinetController
                     $currentId,
                     $request->files->get('files'),
                     true,
-                    true
                 );
             }
 
-//            $cat = [1,4,5];
-//            $c = Category::find($cat);
-//            $this->article->categories()->attach($c);
-
             DB::commit();
 
-            return \response()->json([
+            return response()->json([
                 'success' => true,
                 'article' => $this->article
-            ], 200);
-        } catch (\Exception $exception) {
+            ]);
+        } catch (Exception $exception) {
             DB::rollBack();
 
-            return \response()->json([
+            return response()->json([
                 'success' => false,
                 'errors' => [
                     'text' => [
@@ -110,57 +106,73 @@ class PersonalCabinetController
                 $q->with(['profile']);
             },
             'entityStatus',
-            'images'
+            'images' => function($q) {
+                $q->orderBy('order');
+            }
         ])
             ->where(['id' => $id])
             ->get();
 
         if (count($article) > 0) {
-            return \response()->json([
+            return response()->json([
                 'success' => true,
                 'data' => $article
-            ], 200);
+            ]);
         } else {
-            return \response()->json([
+            return response()->json([
                 'success' => false,
                 'data' => $article
             ], 404);
         }
     }
 
-    public function update(ArticleRequest $request, $id): JsonResponse
+    public function update(ArticleRequest $request, Article $article): JsonResponse
     {
         try {
-            $article = Article::find($id);
-            $article->title = $request['title'];
-            $article->description = $request['description'];
-
             DB::beginTransaction();
 
-            if ($request->files->get('files')) {
+            $article->update($request->except('images'));
+
+            $oldImages = $request->images;
+            $images = [];
+
+            if ($oldImages) {
+                foreach ($oldImages as $key => $image) {
+                    if (is_string($image)) {
+                        $oldImage = json_decode($image);
+                        $images[$key] = $oldImage;
+                    } else {
+                        $images[$key] = $image;
+                    }
+                }
+            }
+
+            UploadImagesService::deleteMissingImages($article, $images);
+
+            if ($images) {
                 UploadImagesService::save(
                     self::ENTITY_TYPE,
-                    $id,
-                    $request->files->get('files'),
+                    $article->id,
+                    $images,
                     true,
-                    false,
                 );
             }
 
-            $article->update();
             DB::commit();
 
-            return \response()->json([
+            return response()->json([
                 'success' => true,
-                'data' => $request->files->get('files')
-            ], 200);
-        } catch (\Exception $exception) {
+                'data' => $request['images']
+            ]);
+        } catch (Exception $exception) {
             DB::rollBack();
 
-            return \response()->json([
+            return response()->json([
                 'success' => true,
                 'data' => $exception->getMessage()
-            ], 200);
+            ]);
+        } catch (Throwable $e) {
+            dd($e);
         }
     }
 }
