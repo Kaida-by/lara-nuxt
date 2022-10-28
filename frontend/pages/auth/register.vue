@@ -37,19 +37,19 @@
         <h1 class="text-center w-full pb-5 text-2xl">Registration</h1>
         <el-form :model="form" status-icon :rules="rules" ref="form" class="flex flex-col justify-center items-center">
           <el-form-item prop="name" class="w-3/5">
-            <el-input placeholder="Name" type="text" v-model="form.name"></el-input>
+            <el-input placeholder="Name" type="text" v-model="form.name" :class="{ 'is-invalid': errors.name }"></el-input>
           </el-form-item>
 
           <el-form-item prop="email" class="w-3/5">
-            <el-input placeholder="Email" type="email" v-model="form.email"></el-input>
+            <el-input placeholder="Email" type="email" v-model="form.email" :class="{ 'is-invalid': errors.name }"></el-input>
           </el-form-item>
 
           <el-form-item prop="password" class="w-3/5">
-            <el-input placeholder="Password" type="password" v-model="form.password"></el-input>
+            <el-input placeholder="Password" type="password" v-model="form.password" :class="{ 'is-invalid': errors.name }"></el-input>
           </el-form-item>
 
           <el-form-item prop="password_confirmation" class="w-3/5">
-            <el-input placeholder="Password Confirmation" type="password" v-model="form.password_confirmation"></el-input>
+            <el-input placeholder="Password Confirmation" type="password" v-model="form.password_confirmation" :class="{ 'is-invalid': errors.name }"></el-input>
           </el-form-item>
 
           <el-form-item class="mb-0 text-center w-3/5">
@@ -102,5 +102,8 @@ export default {
 <style scoped>
 .container {
   margin: 5% auto 0 auto;
+}
+.is-invalid .el-input__inner {
+  border-color: red;
 }
 </style>
