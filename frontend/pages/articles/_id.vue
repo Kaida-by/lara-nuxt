@@ -7,16 +7,16 @@
           <div class="top_art_header">
             <h2>{{ article.title }}</h2>
           </div>
-          <div class="top_art_img">
-            <el-image :src="article?.images[0]?.src" alt="" :preview-src-list="[article?.images[0]?.src]" fit=cover>
+          <div v-if="article.images[0].src" class="top_art_img">
+            <el-image :src="article.images[0].src" alt="" :preview-src-list="[article.images[0].src]" fit=cover>
             </el-image>
           </div>
           <div class="med_art_text">
             {{ article.description }}
           </div>
           <div class="bot_art_images">
-            <div class="bot_art_image_in" v-for="image in article?.images">
-              <el-image :src=image?.src alt="img" :preview-src-list="[image?.src]" fit=cover>
+            <div class="bot_art_image_in" v-for="image in article.images">
+              <el-image :src=image.src alt="img" :preview-src-list="[image.src]" fit=cover>
               </el-image>
             </div>
           </div>
@@ -28,15 +28,15 @@
           </el-row>
           <div class="art_profile flex">
             <el-row>
-              <el-col><img :src=article?.user?.profile?.images[0].src alt="img"></el-col>
+              <el-col><img :src=article.user.profile.images[0].src alt="img"></el-col>
             </el-row>
             <el-row>
               <el-col>
-                {{ article?.user?.profile?.surname +
+                {{ article.user.profile.surname +
                 ' ' +
-                article?.user?.profile?.name +
+                article.user.profile.name +
                 ' ' +
-                article?.user?.profile?.patronymic }}
+                article.user.profile.patronymic }}
               </el-col>
             </el-row>
           </div>
