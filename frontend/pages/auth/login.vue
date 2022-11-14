@@ -45,6 +45,11 @@ export default {
     async login() {
       try {
         await this.$auth.login({data: this.form});
+        await this.$axios.get('/get-notifications')
+          .then((res) => {
+            this.notifications = res.data.data
+          })
+          .catch(err => console.log(err))
       } catch(e) {
         return;
       }

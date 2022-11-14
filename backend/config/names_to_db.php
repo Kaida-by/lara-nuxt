@@ -47,5 +47,6 @@ return [
     'entity_statuses' => [
         ['code' => 'active'],
         ['code' => 'under_moderation'],
+        ['code' => 'rejected'],
     ]
 ];

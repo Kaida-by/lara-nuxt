@@ -6,6 +6,8 @@ use App\Http\Requests\AdminArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use App\Models\Image;
+use App\Notifications\ArticleNotification;
+use App\Notifications\UserNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -85,10 +87,11 @@ class AdminArticleController
     public function approve(int $id, AdminArticleRequest $request)
     {
         $article = Article::find($id);
-
         $article->status_id = $request['checked'] == false ? 2 : 1;
+        $user = $article->user()->first();
 
         $article->update();
+        $user->notify(new ArticleNotification());
     }
 
     public function delete(int $id): JsonResponse

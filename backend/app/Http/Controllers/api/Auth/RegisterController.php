@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use App\Models\User;
+use App\Notifications\UserNotification;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -61,6 +62,8 @@ class RegisterController extends Controller
             $this->createProfile($user);
 
             $token = $this->auth->attempt($request->only('email', 'password', 'password_confirmation'));
+
+            $user->notify(new UserNotification);
 
             return response()->json([
                 'success' => true,
