@@ -7,6 +7,7 @@ use App\Http\Controllers\api\Auth\LoginController;
 use App\Http\Controllers\api\Auth\RegisterController;
 use App\Http\Controllers\api\Auth\SocialLoginController;
 use App\Http\Controllers\api\MeController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonalCabinetController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,8 @@ Route::get('/article/{article}' ,[ArticleController::class, 'showOne'])->name('a
 Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/me', [MeController::class, 'index']);
     Route::get('/auth/logout', [MeController::class, 'logout']);
+    Route::get('/get-notifications', [NotificationsController::class, 'getNotifications']);
+    Route::delete('/remove-notification/{id}', [NotificationsController::class, 'removeNotifications']);
 
     //Personal Cabinet
     Route::get('/personal-cabinet', [MeController::class, 'logout']);

@@ -5,6 +5,12 @@
         <nuxt-link to="/">JWT-Auth</nuxt-link>
       </div>
       <div class="header-sdk" v-if="$auth.loggedIn">
+        <div class="notifications">
+          <div class="notification" v-for="(notification, key) in this.notifications">
+            <span>{{ notification }}</span>
+            <span @click="removeNotification(key)">✘</span>
+          </div>
+        </div>
         <div>
           {{ $auth.user.name }}
         </div>
@@ -35,10 +41,37 @@
 <script>
 export default {
   name: "TopNav",
+  data () {
+    return {
+      notifications: [],
+    }
+  },
   methods: {
     logOut() {
       this.$auth.logout();
+    },
+    async getNotifications() {
+      if (this.$auth.loggedIn) {
+        await this.$axios.get('/get-notifications')
+          .then((res) => {
+            this.notifications = res.data.notifications
+          })
+          .catch(err => console.log(err))
+      }
+    },
+    removeNotification( id ) {
+      this.notifications.splice( id, 1 );
+      try {
+        this.$axios.delete('/remove-notification/' + id).then(response => {
+          this.getNotifications();
+        });
+      } catch(e) {
+        return;
+      }
     }
+  },
+  mounted() {
+    this.getNotifications()
   }
 }
 </script>
