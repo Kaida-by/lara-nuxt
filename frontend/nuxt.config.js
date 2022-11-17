@@ -37,6 +37,7 @@ export default {
     './plugins/axios',
     './plugins/vuedraggable.js',
     './plugins/element-ui.js',
+    './plugins/echo.js'
   ],
 
   env: {
@@ -59,7 +60,12 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/laravel-echo'
   ],
+
+  echo: {
+    //
+  },
 
   auth: {
     strategies: {
