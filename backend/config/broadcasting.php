@@ -37,9 +37,9 @@ return [
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
-//                'encrypted' => true,
-//                'useTLS' => true,
-                'host' => '127.0.0.1',
+                'encrypted' => false,
+                'useTLS' => true,
+                'host' => 'api.zhlo.loc',
                 'port' => 6001,
                 'scheme' => 'http',
             ],

@@ -90,7 +90,7 @@ export default {
     },
     async update() {
       try {
-        await this.$axios.patch('/admin/article/approve/' + this.$route.params.id, this.form);
+        await this.$axios.patch('/admin/article/approve/' + this.$route.params.id, this.form, {user_id: 1});
       } catch(e) {
         return;
       }

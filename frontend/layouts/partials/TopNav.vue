@@ -39,6 +39,9 @@
 </template>
 
 <script>
+import echo from "~/plugins/echo";
+import Echo from "~/plugins/echo";
+
 export default {
   name: "TopNav",
   data () {
@@ -70,8 +73,20 @@ export default {
       }
     }
   },
+  // created() {
+  //   this.$echo.channel(`articles`).listen('ApproveEvent', () => console.log(123))
+  // },
   mounted() {
+    // console.log(Echo)
+    // window.Echo.channel(`articles`).listen('ApproveEvent', () => console.log(123))
+    window.Echo.private(`user.1`).listen('ApproveEvent', () => console.log(123))
+    console.log(window.Echo)
     this.getNotifications()
+    // this.$echo.private(`articles.1`)
+    //   .listen('ApproveEvent', ({article}) => {
+    //     console.log(article)
+    //     // this.notifications.push(notifications)
+    //   })
   }
 }
 </script>

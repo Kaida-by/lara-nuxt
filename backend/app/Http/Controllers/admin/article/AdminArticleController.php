@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin\article;
 
+use App\Events\ApproveEvent;
 use App\Http\Requests\AdminArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
@@ -91,7 +92,10 @@ class AdminArticleController
         $user = $article->user()->first();
 
         $article->update();
-        $user->notify(new ArticleNotification());
+
+        ApproveEvent::dispatch($article);
+
+//        $user->notify(new ArticleNotification());
     }
 
     public function delete(int $id): JsonResponse

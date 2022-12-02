@@ -62,7 +62,8 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/laravel-echo'
+    '@nuxtjs/laravel-echo',
+    '@nuxtjs/dotenv'
   ],
 
   echo: {
