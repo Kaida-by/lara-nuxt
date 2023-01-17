@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ApproveEvent implements ShouldBroadcast
+class ApproveEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -26,7 +26,7 @@ class ApproveEvent implements ShouldBroadcast
     public function __construct(Article $article)
     {
         $this->article = $article;
-        $this->dontBroadcastToCurrentUser();
+//        $this->dontBroadcastToCurrentUser();
     }
 
     /**
@@ -36,10 +36,14 @@ class ApproveEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return [
-//            new Channel('articles'),
-            new PrivateChannel('user.' . $this->article->author_id),
-//            new PrivateChannel('articles.' . $this->article->id),
-        ];
+        return new PrivateChannel('user.1');
+    }
+
+    /**
+     * @return string
+     */
+    public function broadcastAs(): string
+    {
+        return 'user.1';
     }
 }

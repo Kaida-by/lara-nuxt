@@ -9,6 +9,7 @@ use App\Http\Controllers\api\Auth\SocialLoginController;
 use App\Http\Controllers\api\MeController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonalCabinetController;
+use Illuminate\Broadcasting\BroadcastController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
@@ -29,8 +30,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix' => '/auth'], function () {
-   Route::post('register', [RegisterController::class, 'register']);
-   Route::post('login', [LoginController::class, 'login']);
+    Route::post('register', [RegisterController::class, 'register']);
+    Route::post('login', [LoginController::class, 'login']);
 
    //social
     Route::get('/login/{service}', [SocialLoginController::class, 'redirect']);
@@ -41,6 +42,7 @@ Route::get('/articles', [ArticleController::class, 'showAll'])->name('articles.i
 Route::get('/article/{article}' ,[ArticleController::class, 'showOne'])->name('article.showOne');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
+    Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
     Route::get('/me', [MeController::class, 'index']);
     Route::get('/auth/logout', [MeController::class, 'logout']);
     Route::get('/get-notifications', [NotificationsController::class, 'getNotifications']);

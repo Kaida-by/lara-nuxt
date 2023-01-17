@@ -88,14 +88,14 @@ class AdminArticleController
     public function approve(int $id, AdminArticleRequest $request)
     {
         $article = Article::find($id);
-        $article->status_id = $request['checked'] == false ? 2 : 1;
+        $article->status_id = !$request['checked'] ? 2 : 1;
         $user = $article->user()->first();
 
         $article->update();
 
-        ApproveEvent::dispatch($article);
-
-//        $user->notify(new ArticleNotification());
+        event(new ApproveEvent(
+            $article
+        ));
     }
 
     public function delete(int $id): JsonResponse

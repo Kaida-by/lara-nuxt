@@ -17,6 +17,9 @@
         <div class="auth-div">
           <nuxt-link to="/personal-cabinet">personal-cabinet</nuxt-link>
         </div>
+        <div class="notifications">
+          notifications
+        </div>
         <div @click.prevent="logOut">logout</div>
       </div>
       <div class="header-sdk" v-else>
@@ -39,8 +42,6 @@
 </template>
 
 <script>
-import echo from "~/plugins/echo";
-import Echo from "~/plugins/echo";
 
 export default {
   name: "TopNav",
@@ -51,7 +52,9 @@ export default {
   },
   methods: {
     logOut() {
-      this.$auth.logout();
+      if (this.$auth.loggedIn) {
+        this.$auth.logout();
+      }
     },
     async getNotifications() {
       if (this.$auth.loggedIn) {
@@ -71,22 +74,19 @@ export default {
       } catch(e) {
         return;
       }
+    },
+    connectToPrivateChannel() {
+      window.Echo.private(`user.1`)
+        .listen('user.1', ({article}) => {
+          console.log(article)
+        })
     }
   },
-  // created() {
-  //   this.$echo.channel(`articles`).listen('ApproveEvent', () => console.log(123))
-  // },
   mounted() {
-    // console.log(Echo)
-    // window.Echo.channel(`articles`).listen('ApproveEvent', () => console.log(123))
-    window.Echo.private(`user.1`).listen('ApproveEvent', () => console.log(123))
-    console.log(window.Echo)
-    this.getNotifications()
-    // this.$echo.private(`articles.1`)
-    //   .listen('ApproveEvent', ({article}) => {
-    //     console.log(article)
-    //     // this.notifications.push(notifications)
-    //   })
+    this.getNotifications();
+    if (this.$auth.loggedIn) {
+      this.connectToPrivateChannel();
+    }
   }
 }
 </script>
