@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Article;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,21 +11,12 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ApproveEvent implements ShouldBroadcastNow
+class Notifications implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $article;
-
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct(Article $article)
+    public function __construct(public int $id)
     {
-        $this->article = $article;
-//        $this->dontBroadcastToCurrentUser();
     }
 
     /**
@@ -36,14 +26,6 @@ class ApproveEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('user.1');
-    }
-
-    /**
-     * @return string
-     */
-    public function broadcastAs(): string
-    {
-        return 'user.1';
+        return new PrivateChannel('user.' . $this->id);
     }
 }

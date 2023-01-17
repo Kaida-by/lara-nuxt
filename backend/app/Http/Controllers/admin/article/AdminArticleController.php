@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\admin\article;
 
-use App\Events\ApproveEvent;
+use App\Events\Notifications;
 use App\Http\Requests\AdminArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use App\Models\Image;
-use App\Notifications\ArticleNotification;
-use App\Notifications\UserNotification;
+use App\Notifications\DeleteEntityNotification;
+use App\Notifications\PublishEntityNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -18,6 +18,7 @@ class AdminArticleController
 {
     const CATEGORY = 2;
     const ENTITY_TYPE = 2;
+    const ENTITY_NAME = 'acticle';
 
     protected Article $article;
 
@@ -93,25 +94,24 @@ class AdminArticleController
 
         $article->update();
 
-        event(new ApproveEvent(
-            $article
-        ));
+        $user->notify(new PublishEntityNotification(self::ENTITY_NAME));
+        event(new Notifications($article->user()->first()->id));
     }
 
     public function delete(int $id): JsonResponse
     {
         $article = Article::with([
             'images',
+            'user'
         ])
             ->where(['id' => $id])
-            ->limit(1)
-            ->get();
+            ->first();
 
         DB::beginTransaction();
 
         try {
-            if (isset($article[0]) && $article[0]->images instanceof Collection) {
-                foreach ($article[0]->images as $image) {
+            if (isset($article) && $article->images instanceof Collection) {
+                foreach ($article->images as $image) {
                     $image = Image::find($image['id']);
 
                     if ($image['is_local'] === 1) {
@@ -120,8 +120,13 @@ class AdminArticleController
 
                     Image::destroy(['id' => $image['id']]);
                 }
+
+                $article->user()->first()->notify(new DeleteEntityNotification(self::ENTITY_NAME));
+                event(new Notifications($article->user()->first()->id));
+
                 Article::destroy($id);
                 DB::commit();
+
 
                 return \response()->json([
                     'success' => true,

@@ -5,21 +5,13 @@
         <nuxt-link to="/">JWT-Auth</nuxt-link>
       </div>
       <div class="header-sdk" v-if="$auth.loggedIn">
-        <div class="notifications">
-          <div class="notification" v-for="(notification, key) in this.notifications">
-            <span>{{ notification }}</span>
-            <span @click="removeNotification(key)">✘</span>
-          </div>
-        </div>
         <div>
           {{ $auth.user.name }}
         </div>
         <div class="auth-div">
           <nuxt-link to="/personal-cabinet">personal-cabinet</nuxt-link>
         </div>
-        <div class="notifications">
-          notifications
-        </div>
+        <Notifications></Notifications>
         <div @click.prevent="logOut">logout</div>
       </div>
       <div class="header-sdk" v-else>
@@ -43,50 +35,17 @@
 
 <script>
 
+import Notifications from "~/layouts/partials/Notifications";
+
 export default {
   name: "TopNav",
-  data () {
-    return {
-      notifications: [],
-    }
-  },
+  components: {Notifications},
   methods: {
     logOut() {
       if (this.$auth.loggedIn) {
         this.$auth.logout();
       }
     },
-    async getNotifications() {
-      if (this.$auth.loggedIn) {
-        await this.$axios.get('/get-notifications')
-          .then((res) => {
-            this.notifications = res.data.notifications
-          })
-          .catch(err => console.log(err))
-      }
-    },
-    removeNotification( id ) {
-      this.notifications.splice( id, 1 );
-      try {
-        this.$axios.delete('/remove-notification/' + id).then(response => {
-          this.getNotifications();
-        });
-      } catch(e) {
-        return;
-      }
-    },
-    connectToPrivateChannel() {
-      window.Echo.private(`user.1`)
-        .listen('user.1', ({article}) => {
-          console.log(article)
-        })
-    }
-  },
-  mounted() {
-    this.getNotifications();
-    if (this.$auth.loggedIn) {
-      this.connectToPrivateChannel();
-    }
   }
 }
 </script>
