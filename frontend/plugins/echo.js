@@ -32,6 +32,4 @@ export default (app, inject) => {
       };
     }
   });
-
-  // echo.private(`user.1`).listen('user.1', () => console.log(123))
 }

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ApproveEvent;
+use App\Events\Notifications;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Services\UploadImagesService;
 use App\Models\Article;
 use App\Models\Profile;
+use App\Notifications\CreateEntityNotification;
+use App\Notifications\DeleteEntityNotification;
+use App\Notifications\UpdateEntityNotification;
+use App\Notifications\UserNotification;
 use Throwable;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +23,7 @@ class PersonalCabinetController
 {
     const ENTITY_TYPE = 2;
     const CATEGORY = 2;
+    const ENTITY_NAME = 'acticle';
 
     protected Article $article;
     protected $profileId;
@@ -78,7 +83,9 @@ class PersonalCabinetController
 
             DB::commit();
 
-            ApproveEvent::dispatch($this->article);
+            $user = \Auth::user();
+            $user->notify(new CreateEntityNotification(self::ENTITY_NAME));
+            event(new Notifications($user->id));
 
             return response()->json([
                 'success' => true,
@@ -162,6 +169,10 @@ class PersonalCabinetController
             }
 
             DB::commit();
+
+            $user = \Auth::user();
+            $user->notify(new UpdateEntityNotification(self::ENTITY_NAME));
+            event(new Notifications($user->id));
 
             return response()->json([
                 'success' => true,
