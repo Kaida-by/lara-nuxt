@@ -3,7 +3,7 @@
     <div class="sm:mx-auto w-2/5 h-full flex flex-col items-center justify-center">
       <div class="bg-white w-full rounded-lg pt-12 pb-7">
         <h1 class="text-center w-full pb-5 text-2xl">Sign In</h1>
-        <el-form :model="form" status-icon :rules="rules" ref="form" class="flex flex-col justify-center items-center">
+        <el-form :model="form" ref="form" class="flex flex-col justify-center items-center">
           <el-form-item prop="email" class="w-3/5">
             <el-input placeholder="Email" type="email" v-model="form.email"></el-input>
           </el-form-item>
@@ -45,6 +45,7 @@ export default {
     async login() {
       try {
         await this.$auth.login({data: this.form});
+        this.connectToPrivateChannel();
         await this.$axios.get('/get-notifications')
           .then((res) => {
             this.notifications = res.data.data
@@ -55,6 +56,12 @@ export default {
       }
 
       this.$router.push({name: 'index'});
+    },
+    connectToPrivateChannel() {
+      window.Echo.private(`user.1`)
+        .listen('user.1', ({article}) => {
+          console.log(article)
+        })
     }
   }
 }

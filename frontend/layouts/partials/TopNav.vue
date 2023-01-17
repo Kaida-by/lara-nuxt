@@ -17,6 +17,9 @@
         <div class="auth-div">
           <nuxt-link to="/personal-cabinet">personal-cabinet</nuxt-link>
         </div>
+        <div class="notifications">
+          notifications
+        </div>
         <div @click.prevent="logOut">logout</div>
       </div>
       <div class="header-sdk" v-else>
@@ -39,6 +42,7 @@
 </template>
 
 <script>
+
 export default {
   name: "TopNav",
   data () {
@@ -48,7 +52,9 @@ export default {
   },
   methods: {
     logOut() {
-      this.$auth.logout();
+      if (this.$auth.loggedIn) {
+        this.$auth.logout();
+      }
     },
     async getNotifications() {
       if (this.$auth.loggedIn) {
@@ -68,10 +74,19 @@ export default {
       } catch(e) {
         return;
       }
+    },
+    connectToPrivateChannel() {
+      window.Echo.private(`user.1`)
+        .listen('user.1', ({article}) => {
+          console.log(article)
+        })
     }
   },
   mounted() {
-    this.getNotifications()
+    this.getNotifications();
+    if (this.$auth.loggedIn) {
+      this.connectToPrivateChannel();
+    }
   }
 }
 </script>

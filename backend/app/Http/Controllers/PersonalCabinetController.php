@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ApproveEvent;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Services\UploadImagesService;
@@ -76,6 +77,8 @@ class PersonalCabinetController
             }
 
             DB::commit();
+
+            ApproveEvent::dispatch($this->article);
 
             return response()->json([
                 'success' => true,

@@ -37,10 +37,13 @@ export default {
     './plugins/axios',
     './plugins/vuedraggable.js',
     './plugins/element-ui.js',
+    './plugins/echo.js'
   ],
 
   env: {
-    baseUrl: process.env.BASE_URL || 'https://api.zh-bel.tk/api/'
+    baseUrl: process.env.BASE_URL || 'https://api.zh-bel.tk/api/' ,
+    pusherKey: process.env.PUSHER_APP_KEY,
+    pusherCluster: process.env.PUSHER_APP_CLUSTER,
   },
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -59,7 +62,13 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/laravel-echo',
+    '@nuxtjs/dotenv'
   ],
+
+  echo: {
+    //
+  },
 
   auth: {
     strategies: {
