@@ -21,4 +21,9 @@ class NotificationsController
     {
         NotificationService::removeNotifications($notificationId, $request->user());
     }
+
+    public function setMarkAsReadNotification(string $notificationUuid, Request $request)
+    {
+        NotificationService::setMarkAsReadNotification($notificationUuid, $request->user());
+    }
 }
