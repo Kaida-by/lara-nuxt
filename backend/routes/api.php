@@ -47,6 +47,7 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/auth/logout', [MeController::class, 'logout']);
     Route::get('/get-notifications', [NotificationsController::class, 'getNotifications']);
     Route::delete('/remove-notification/{id}', [NotificationsController::class, 'removeNotifications']);
+    Route::post('/set-mark-as-read/{uuid}', [NotificationsController::class, 'setMarkAsReadNotification']);
 
     //Personal Cabinet
     Route::get('/personal-cabinet', [MeController::class, 'logout']);

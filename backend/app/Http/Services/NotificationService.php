@@ -3,18 +3,20 @@
 namespace App\Http\Services;
 
 use App\Models\User;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 
 class NotificationService
 {
     /**
      * @param User $user
      */
-    public static function getNotification(User $user): array
+    public static function getNotification(User $user)
     {
         $allNotifications = [];
 
-        foreach ($user->unreadNotifications as $notification) {
-            $allNotifications[] = $notification['data']['message'];
+        foreach ($user->notifications as $notification) {
+            $allNotifications[] = $notification;
         }
 
         return $allNotifications;
@@ -25,6 +27,16 @@ class NotificationService
         foreach ($user->unreadNotifications as $key => $notification) {
             if ($notificationId === $key) {
                 $notification->delete();
+            }
+        }
+    }
+
+    public static function setMarkAsReadNotification(string $notificationUuid, User $user)
+    {
+        foreach ($user->notifications as $notification) {
+
+            if ($notification->id === $notificationUuid) {
+                $notification->markAsRead();
             }
         }
     }

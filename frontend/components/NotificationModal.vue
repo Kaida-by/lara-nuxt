@@ -3,7 +3,7 @@
     <div class="modal-overlay" @click="$emit('close-modal')">
       <div class="modal" @click.stop>
         <div class="notification222" v-for="(notification, key) in this.notifications">
-          <span>{{ notification }}</span>
+          <span @click="setMarkAsRead(notification.id)">{{ notification.data.message }}</span>
           <span @click="removeNotification(key)">✘</span>
         </div>
       </div>
@@ -31,6 +31,15 @@ export default {
         return;
       }
     },
+    setMarkAsRead(uuid) {
+      try {
+        this.$axios.post('/set-mark-as-read/' + uuid).then(response => {
+          this.getNotifications();
+        });
+      } catch(e) {
+        return;
+      }
+    }
   }
 }
 </script>
