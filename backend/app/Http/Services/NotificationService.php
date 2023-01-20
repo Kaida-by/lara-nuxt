@@ -22,10 +22,10 @@ class NotificationService
         return $allNotifications;
     }
 
-    public static function removeNotifications(int $notificationId, User $user): void
+    public static function removeNotifications(string $notificationUuid, User $user): void
     {
-        foreach ($user->unreadNotifications as $key => $notification) {
-            if ($notificationId === $key) {
+        foreach ($user->notifications as $notification) {
+            if ($notification->id === $notificationUuid) {
                 $notification->delete();
             }
         }

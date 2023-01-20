@@ -1,9 +1,15 @@
 <template>
   <div class="container">
-    <div class="notifications" @click="showModal = true" v-if="this.notifications">
-      notifications - {{this.notifications.length}}
+    <div class="notifications" @click="showModal = true" v-if="notifications">
+      notifications - {{notifications.length}}
     </div>
-    <NotificationModal v-show="showModal" @close-modal="showModal = false" :notifications=this.notifications />
+    <NotificationModal
+      v-show="showModal"
+      @close-modal="showModal = false"
+      :notifications=notifications
+      @mark-as-read="setMarkAsRead"
+      @remove-notification="removeNotification"
+    />
   </div>
 </template>
 
@@ -39,6 +45,25 @@ export default {
       this.channel.listen('Notifications', () => {
         this.getNotifications();
       })
+    },
+    removeNotification(uuid) {
+      this.notifications = this.notifications.filter( (value) => value.id !== uuid);
+      try {
+        this.$axios.delete('/remove-notification/' + uuid).then(response => {
+          this.getNotifications();
+        });
+      } catch(e) {
+        return;
+      }
+    },
+    setMarkAsRead(uuid) {
+      try {
+        this.$axios.post('/set-mark-as-read/' + uuid).then(response => {
+          this.getNotifications();
+        });
+      } catch(e) {
+        return;
+      }
     }
   },
   mounted() {
