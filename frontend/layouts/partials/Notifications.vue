@@ -7,7 +7,6 @@
       v-show="showModal"
       @close-modal="showModal = false"
       :notifications=notifications
-      @mark-as-read="setMarkAsRead"
       @remove-notification="removeNotification"
     />
   </div>
@@ -56,15 +55,6 @@ export default {
         return;
       }
     },
-    setMarkAsRead(uuid) {
-      try {
-        this.$axios.post('/set-mark-as-read/' + uuid).then(response => {
-          this.getNotifications();
-        });
-      } catch(e) {
-        return;
-      }
-    }
   },
   mounted() {
     this.getNotifications();

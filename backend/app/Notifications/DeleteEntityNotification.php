@@ -16,7 +16,7 @@ class DeleteEntityNotification extends Notification
      *
      * @return void
      */
-    public function __construct(public string $nameEntity)
+    public function __construct(private string $typeEntity, private string $nameEntity)
     {
     }
 
@@ -40,7 +40,7 @@ class DeleteEntityNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'message' => 'Your ' . $this->nameEntity . ' was deleted!'
+            'message' => 'Your ' . $this->typeEntity . ' "' . $this->nameEntity . '" was deleted!'
         ];
     }
 }

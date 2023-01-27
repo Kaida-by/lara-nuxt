@@ -3,13 +3,13 @@
     <div class="modal-overlay" @click="$emit('close-modal')">
       <div class="modal" @click.stop>
         <div class="notification222" v-for="(notification) in notifications">
-          <span @click="$emit('mark-as-read', notification.id)" v-if="notification.read_at" class="is_read">
-            {{ notification.data.message }}
-          </span>
-          <span @click="$emit('mark-as-read', notification.id)" v-if="notification.read_at == null" class="is_not_read">
+          <span>
             {{ notification.data.message }}
           </span>
           <span @click="$emit('remove-notification', notification.id)">✘</span>
+          <div>
+            <span class="text-gray-300">{{ notification.created_at }}</span>
+          </div>
         </div>
       </div>
       <div class="close" @click="$emit('close-modal')">
@@ -85,8 +85,5 @@ button {
 .modal-fade-enter-active,
 .modal-fade-leave-active {
   transition: opacity 0.5s ease;
-}
-.is_read {
-  color: gray;
 }
 </style>
