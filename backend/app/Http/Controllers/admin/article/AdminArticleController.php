@@ -88,13 +88,14 @@ class AdminArticleController
 
     public function approve(int $id, AdminArticleRequest $request)
     {
+        /** @var Article $article */
         $article = Article::find($id);
         $article->status_id = !$request['checked'] ? 2 : 1;
         $user = $article->user()->first();
 
         $article->update();
 
-        $user->notify(new PublishEntityNotification(self::ENTITY_NAME));
+        $user->notify(new PublishEntityNotification(self::ENTITY_NAME, $article->title));
         event(new Notifications($article->user()->first()->id));
     }
 
@@ -121,7 +122,7 @@ class AdminArticleController
                     Image::destroy(['id' => $image['id']]);
                 }
 
-                $article->user()->first()->notify(new DeleteEntityNotification(self::ENTITY_NAME));
+                $article->user()->first()->notify(new DeleteEntityNotification(self::ENTITY_NAME, $article->title));
                 event(new Notifications($article->user()->first()->id));
 
                 Article::destroy($id);

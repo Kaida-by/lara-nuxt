@@ -2,9 +2,14 @@
   <transition name="modal-fade">
     <div class="modal-overlay" @click="$emit('close-modal')">
       <div class="modal" @click.stop>
-        <div class="notification222" v-for="(notification, key) in this.notifications">
-          <span @click="setMarkAsRead(notification.id)">{{ notification.data.message }}</span>
-          <span @click="removeNotification(key)">✘</span>
+        <div class="notification222" v-for="(notification) in notifications">
+          <span>
+            {{ notification.data.message }}
+          </span>
+          <span @click="$emit('remove-notification', notification.id)">✘</span>
+          <div>
+            <span class="text-gray-300">{{ notification.created_at }}</span>
+          </div>
         </div>
       </div>
       <div class="close" @click="$emit('close-modal')">
@@ -20,27 +25,7 @@ export default {
   props: [
     'notifications'
   ],
-  methods: {
-    removeNotification( id ) {
-      this.notifications.splice( id, 1 );
-      try {
-        this.$axios.delete('/remove-notification/' + id).then(response => {
-          this.getNotifications();
-        });
-      } catch(e) {
-        return;
-      }
-    },
-    setMarkAsRead(uuid) {
-      try {
-        this.$axios.post('/set-mark-as-read/' + uuid).then(response => {
-          this.getNotifications();
-        });
-      } catch(e) {
-        return;
-      }
-    }
-  }
+  emits: ['mark-as-read', 'remove-notification']
 }
 </script>
 

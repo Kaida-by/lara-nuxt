@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NotificationResource;
 use App\Http\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,13 +14,13 @@ class NotificationsController
         $notifications = NotificationService::getNotification($request->user());
 
         return response()->json([
-            'notifications' => $notifications,
+            'notifications' => NotificationResource::collection($notifications),
         ]);
     }
 
-    public function removeNotifications(int $notificationId, Request $request)
+    public function removeNotifications(string $notificationUuid, Request $request)
     {
-        NotificationService::removeNotifications($notificationId, $request->user());
+        NotificationService::removeNotifications($notificationUuid, $request->user());
     }
 
     public function setMarkAsReadNotification(string $notificationUuid, Request $request)

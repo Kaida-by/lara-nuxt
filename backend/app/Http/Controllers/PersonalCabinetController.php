@@ -84,7 +84,7 @@ class PersonalCabinetController
             DB::commit();
 
             $user = \Auth::user();
-            $user->notify(new CreateEntityNotification(self::ENTITY_NAME));
+            $user->notify(new CreateEntityNotification(self::ENTITY_NAME, $this->article->title));
             event(new Notifications($user->id));
 
             return response()->json([
@@ -171,7 +171,7 @@ class PersonalCabinetController
             DB::commit();
 
             $user = \Auth::user();
-            $user->notify(new UpdateEntityNotification(self::ENTITY_NAME));
+            $user->notify(new UpdateEntityNotification(self::ENTITY_NAME, $article->title));
             event(new Notifications($user->id));
 
             return response()->json([
