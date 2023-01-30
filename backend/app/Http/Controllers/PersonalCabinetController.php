@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\Notifications;
 use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
+use App\Http\Services\EntityHelper;
 use App\Http\Services\UploadImagesService;
 use App\Models\Article;
 use App\Models\Profile;
@@ -42,7 +43,7 @@ class PersonalCabinetController
                 $q->where('entity_type_id', self::ENTITY_TYPE);
             }
         ])
-            ->where(['status_id' => Article::ENTITY_STATUS_ACTIVE])
+            ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
             ->where(['author_id' => $this->profileId])
             ->simplePaginate(10);
 
@@ -58,7 +59,7 @@ class PersonalCabinetController
         $this->article->author_id = $this->profileId;
         $this->article->entity_type_id = self::ENTITY_TYPE;
         $this->article->category_id = self::CATEGORY;
-        $this->article->status_id = Article::ENTITY_STATUS_UNDER_MODERATION;
+        $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
 
         try {
             DB::beginTransaction();

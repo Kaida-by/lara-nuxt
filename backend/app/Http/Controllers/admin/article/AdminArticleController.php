@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin\article;
 use App\Events\Notifications;
 use App\Http\Requests\AdminArticleRequest;
 use App\Http\Resources\ArticleResource;
+use App\Http\Services\EntityHelper;
 use App\Models\Article;
 use App\Models\Image;
 use App\Notifications\DeleteEntityNotification;
@@ -17,25 +18,13 @@ use Illuminate\Support\Facades\DB;
 class AdminArticleController
 {
     const CATEGORY = 2;
-    const ENTITY_TYPE = 2;
     const ENTITY_NAME = 'acticle';
-
-    protected Article $article;
-
-    /**
-     * AdminArticleController constructor.
-     * @param Article $article
-     */
-    public function __construct(Article $article)
-    {
-        $this->article = $article;
-    }
 
     public function showAll(): AnonymousResourceCollection
     {
         $articles = Article::with([
             'images' => function($q) {
-                $q->where('entity_type_id', self::ENTITY_TYPE);
+                $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
             },
             'entityStatus'
         ])
