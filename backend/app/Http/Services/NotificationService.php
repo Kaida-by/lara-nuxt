@@ -3,15 +3,13 @@
 namespace App\Http\Services;
 
 use App\Models\User;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
 
 class NotificationService
 {
     /**
      * @param User $user
      */
-    public static function getNotification(User $user)
+    public static function getNotification(User $user): array
     {
         $allNotifications = [];
 
@@ -31,7 +29,7 @@ class NotificationService
         }
     }
 
-    public static function setMarkAsReadNotification(string $notificationUuid, User $user)
+    public static function setMarkAsReadNotification(string $notificationUuid, User $user): void
     {
         foreach ($user->notifications as $notification) {
 

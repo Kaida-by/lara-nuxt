@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 
-class Article extends Model implements EntityInterface
+class Article extends Model
 {
     use HasFactory, Searchable;
 
