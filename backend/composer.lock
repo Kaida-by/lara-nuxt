@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aca3ea30461cfa35ebfd37864793e814",
+    "content-hash": "3e963d256aedd4456f90fc0d2fbfed50",
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
@@ -2318,6 +2318,51 @@
                 "source": "https://github.com/http-interop/http-factory-guzzle/tree/1.2.0"
             },
             "time": "2021-07-21T13:50:14+00:00"
+        },
+        {
+            "name": "kaida-by/php-multiexception",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kaida-by/php-multiexception.git",
+                "reference": "792d26fa586894c0791194ba0f577997c6f24744"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kaida-by/php-multiexception/zipball/792d26fa586894c0791194ba0f577997c6f24744",
+                "reference": "792d26fa586894c0791194ba0f577997c6f24744",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0 "
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "KaidaBy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Denis Stolyarov",
+                    "email": "skwidw92@gmail.com"
+                }
+            ],
+            "description": "Catch a few exceptions and show them",
+            "homepage": "https://github.com/Kaida-by/php-multiexception",
+            "keywords": [
+                "multiexception"
+            ],
+            "support": {
+                "issues": "https://github.com/Kaida-by/php-multiexception/issues",
+                "source": "https://github.com/Kaida-by/php-multiexception/tree/master"
+            },
+            "time": "2023-01-30T13:33:23+00:00"
         },
         {
             "name": "laravel/framework",
@@ -12207,7 +12252,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "kaida-by/php-multiexception": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

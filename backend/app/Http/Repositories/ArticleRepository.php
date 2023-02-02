@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpMultipleClassDeclarationsInspection */
+
 namespace App\Http\Repositories;
 
 use App\Http\Interfaces\ArticleRepositoryInterface;
@@ -8,6 +10,7 @@ use App\Http\Services\EntityHelper;
 use App\Models\Article;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use function response;
 
 class ArticleRepository implements ArticleRepositoryInterface
 {
@@ -25,7 +28,7 @@ class ArticleRepository implements ArticleRepositoryInterface
         return ArticleResource::collection($articles);
     }
 
-    public function showOne(Article $article): JsonResponse
+    public function showOne(int $id): JsonResponse
     {
         $article = Article::with([
             'user' => function($q) {
@@ -45,10 +48,10 @@ class ArticleRepository implements ArticleRepositoryInterface
                 $q->orderBy('order');
             }
         ])
-            ->where(['id' => $article->id])
+            ->where(['id' => $id])
             ->get();
 
-        return \response()->json([
+        return response()->json([
             'success' => true,
             'data' => $article
         ]);

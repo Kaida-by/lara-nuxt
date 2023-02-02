@@ -7,7 +7,7 @@
           <div class="top_art_header">
             <h2>{{ article.title }}</h2>
           </div>
-          <div v-if="article.images[0].src" class="top_art_img">
+          <div v-if="article.images[0]" class="top_art_img">
             <el-image :src="article.images[0].src" alt="" :preview-src-list="[article.images[0].src]" fit=cover>
             </el-image>
           </div>
@@ -27,7 +27,7 @@
             <el-col class="h-profile">Автор:</el-col>
           </el-row>
           <div class="art_profile flex">
-            <el-row>
+            <el-row v-if="article.user.profile.images[0]">
               <el-col><img :src=article.user.profile.images[0].src alt="img"></el-col>
             </el-row>
             <el-row>

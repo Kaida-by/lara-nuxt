@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Http\Services;
 
@@ -6,6 +6,7 @@ use App\Http\Controllers\CloudController;
 use App\Models\Article;
 use App\Models\Image;
 use Exception;
+use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Support\Str;
@@ -28,6 +29,9 @@ class UploadImagesService
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public static function upload
     (
         UploadedFile|stdClass $uploadedFile,
@@ -41,11 +45,11 @@ class UploadImagesService
 
         if ($uploadedFile instanceof UploadedFile) {
             if ($uploadedFile->getSize() > 10000000) {
-                throw new Exception('Max file size 10 Mb');
+                throw new RuntimeException('Max file size 10 Mb');
             }
 
-            if (!in_array($uploadedFile->getMimeType(), $permittedMimeTypes)) {
-                throw new Exception('Valid File Format: jpeg, jpg, png');
+            if (!in_array($uploadedFile->getMimeType(), $permittedMimeTypes, true)) {
+                throw new RuntimeException('Valid File Format: jpeg, jpg, png');
             }
 
             $newName = Str::uuid() . '.' . $uploadedFile->getClientOriginalExtension();
@@ -100,10 +104,7 @@ class UploadImagesService
 
     public static function getSrc(UploadedFile $uploadedFile): string
     {
-        $publicPath = config('filesystems.file_src');
-        $fileName = $uploadedFile->getClientOriginalName();
-
-        return "{$publicPath}{$fileName}";
+        return config('filesystems.file_src') . $uploadedFile->getClientOriginalName();
     }
 
 //    public static function update(array $files, int $entity_type, int $entity_id, string $newMainImageUuid)
