@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Http\Controllers;
 
@@ -8,11 +10,10 @@ use App\Http\Resources\ArticleResource;
 use App\Http\Services\EntityHelper;
 use App\Http\Services\UploadImagesService;
 use App\Models\Article;
-use App\Models\Profile;
+use App\Models\User;
 use App\Notifications\CreateEntityNotification;
-use App\Notifications\DeleteEntityNotification;
 use App\Notifications\UpdateEntityNotification;
-use App\Notifications\UserNotification;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -20,20 +21,17 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use function response;
 
-class PersonalCabinetController
+class PersonalCabinetController extends Controller
 {
-    const ENTITY_TYPE = 2;
-    const CATEGORY = 2;
-    const ENTITY_NAME = 'acticle';
+    public const ENTITY_TYPE = 2;
+    public const CATEGORY = 2;
+    public const ENTITY_NAME = 'article';
 
     protected Article $article;
-    protected $profileId;
-    protected $auth;
 
     public function __construct(Article $article)
     {
         $this->article = $article;
-        $this->profileId = Profile::select('id')->where(['user_id' => 1])->limit(1)->get()[0]->id;
     }
 
     public function getMyArticles(): AnonymousResourceCollection
@@ -44,19 +42,22 @@ class PersonalCabinetController
             }
         ])
             ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
-            ->where(['author_id' => $this->profileId])
+            ->where(['author_id' => $this->user()->profile->id])
             ->simplePaginate(10);
 
         return ArticleResource::collection($articles);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function store(ArticleRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
         $this->article->title = $validatedData['title'];
         $this->article->description = $validatedData['description'];
-        $this->article->author_id = $this->profileId;
+        $this->article->author_id = $this->user()->profile->id;
         $this->article->entity_type_id = self::ENTITY_TYPE;
         $this->article->category_id = self::CATEGORY;
         $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
@@ -77,14 +78,14 @@ class PersonalCabinetController
                 UploadImagesService::save(
                     self::ENTITY_TYPE,
                     $currentId,
-                    $request->files->get('files'),
-                    true,
+                    $request->files->get('files')
                 );
             }
 
             DB::commit();
 
-            $user = \Auth::user();
+            /** @var User $user */
+            $user = Auth::user();
             $user->notify(new CreateEntityNotification(self::ENTITY_NAME, $this->article->title));
             event(new Notifications($user->id));
 
@@ -129,14 +130,17 @@ class PersonalCabinetController
                 'success' => true,
                 'data' => $article
             ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'data' => $article
-            ], 404);
         }
+
+        return response()->json([
+            'success' => false,
+            'data' => $article
+        ], 404);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function update(ArticleRequest $request, Article $article): JsonResponse
     {
         try {
@@ -150,7 +154,7 @@ class PersonalCabinetController
             if ($oldImages) {
                 foreach ($oldImages as $key => $image) {
                     if (is_string($image)) {
-                        $oldImage = json_decode($image);
+                        $oldImage = json_decode($image, false, 512, JSON_THROW_ON_ERROR);
                         $images[$key] = $oldImage;
                     } else {
                         $images[$key] = $image;
@@ -164,14 +168,14 @@ class PersonalCabinetController
                 UploadImagesService::save(
                     self::ENTITY_TYPE,
                     $article->id,
-                    $images,
-                    true,
+                    $images
                 );
             }
 
             DB::commit();
 
-            $user = \Auth::user();
+            /** @var User $user */
+            $user = Auth::user();
             $user->notify(new UpdateEntityNotification(self::ENTITY_NAME, $article->title));
             event(new Notifications($user->id));
 
