@@ -6,8 +6,7 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate",
-    "prepare": "husky install"
+    "generate": "nuxt generate"
   },
   "dependencies": {
     "@nuxtjs/auth-next": "5.0.0-1648802546.c9880dc",
@@ -25,7 +24,6 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^5.3.3",
-    "husky": "^8.0.1",
     "nuxt-meilisearch": "^0.1.1",
     "sass": "^1.54.5",
     "sass-loader": "^10.3.1"

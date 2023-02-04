@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-
+    <breadcrumbs></breadcrumbs>
     <div class="page">
 
       <div class="left_area">
@@ -63,9 +63,13 @@
 
 <script>
 import axios from "axios";
+import Breadcrumbs from "~/components/Breadcrumbs";
 
 export default {
   name: "index",
+  components: {
+    Breadcrumbs
+  },
   data () {
     return {
       page: 1,
