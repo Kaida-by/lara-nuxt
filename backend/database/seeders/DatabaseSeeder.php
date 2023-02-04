@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +14,7 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         //add entity_types
 
@@ -91,6 +92,27 @@ class DatabaseSeeder extends Seeder
             $entity_statuses[$key][$entity_status_code] = $entity_status['code'];
         }
 
+        //add user
+
+        $user['id'] = 1;
+        $user['name'] = 'admin';
+        $user['email'] = 'admin@admin.com';
+        $user['role_id'] = 1;
+        $user['status_id'] = 2;
+        $user['password'] = '$2y$10$ll.PSax4PxRt3Z3yvdNDNeKpsc3d1u1NnKNpy54f9weWWIRpF8hgq';
+        $user['created_at'] = Carbon::now();
+        $user['updated_at'] = Carbon::now();
+
+        //add profile
+
+        $profile['id'] = 1;
+        $profile['name'] = 'test profile name';
+        $profile['surname'] = 'test profile surname';
+        $profile['patronymic'] = 'test profile patronymic';
+        $profile['user_id'] = 1;
+        $profile['entity_type_id'] = 3;
+        $profile['created_at'] = Carbon::now();
+        $profile['updated_at'] = Carbon::now();
 
         //add test admin
 
@@ -100,5 +122,7 @@ class DatabaseSeeder extends Seeder
         DB::table('category_types')->insert($category_types);
         DB::table('categories')->insert($categories);
         DB::table('entity_status')->insert($entity_statuses);
+        DB::table('users')->insert($user);
+        DB::table('profiles')->insert($profile);
     }
 }

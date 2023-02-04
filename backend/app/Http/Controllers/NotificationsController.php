@@ -5,26 +5,25 @@ namespace App\Http\Controllers;
 use App\Http\Resources\NotificationResource;
 use App\Http\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
-class NotificationsController
+class NotificationsController extends Controller
 {
-    public function getNotifications(Request $request): JsonResponse
+    public function getNotifications(): JsonResponse
     {
-        $notifications = NotificationService::getNotification($request->user());
+        $notifications = NotificationService::getNotification($this->user());
 
         return response()->json([
             'notifications' => NotificationResource::collection($notifications),
         ]);
     }
 
-    public function removeNotifications(string $notificationUuid, Request $request)
+    public function removeNotifications(string $notificationUuid): void
     {
-        NotificationService::removeNotifications($notificationUuid, $request->user());
+        NotificationService::removeNotifications($notificationUuid, $this->user());
     }
 
-    public function setMarkAsReadNotification(string $notificationUuid, Request $request)
+    public function setMarkAsReadNotification(string $notificationUuid): void
     {
-        NotificationService::setMarkAsReadNotification($notificationUuid, $request->user());
+        NotificationService::setMarkAsReadNotification($notificationUuid, $this->user());
     }
 }

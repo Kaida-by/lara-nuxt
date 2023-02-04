@@ -1,13 +1,14 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Http\Controllers\admin\article;
 
+use App\Http\Controllers\Controller;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class ArticleSearchController
+class ArticleSearchController extends Controller
 {
     public function search(Request $request): AnonymousResourceCollection
     {

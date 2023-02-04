@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Models;
 
@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Laravel\Scout\Searchable;
 
-class Article extends Model implements EntityInterface
+class Article extends Model
 {
     use HasFactory, Searchable;
 
@@ -33,13 +34,25 @@ class Article extends Model implements EntityInterface
         return $this->belongsToMany(Category::class);
     }
 
-    public function user(): HasOne
+    public function user(): HasOneThrough
     {
-        return $this->hasOne(User::class, 'id', 'author_id');
+        return $this->hasOneThrough(
+            User::class,
+            Profile::class,
+            'id',
+            'id',
+            'author_id',
+            'user_id'
+        );
     }
 
     public function entityStatus(): HasOne
     {
         return $this->hasOne(EntityStatus::class, 'id', 'status_id');
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class, 'id', 'author_id');
     }
 }

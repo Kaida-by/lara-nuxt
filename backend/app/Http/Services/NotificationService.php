@@ -1,17 +1,12 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
 namespace App\Http\Services;
 
-use App\Models\User;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class NotificationService
 {
-    /**
-     * @param User $user
-     */
-    public static function getNotification(User $user)
+    public static function getNotification(JWTSubject $user): array
     {
         $allNotifications = [];
 
@@ -22,7 +17,7 @@ class NotificationService
         return $allNotifications;
     }
 
-    public static function removeNotifications(string $notificationUuid, User $user): void
+    public static function removeNotifications(string $notificationUuid, JWTSubject $user): void
     {
         foreach ($user->notifications as $notification) {
             if ($notification->id === $notificationUuid) {
@@ -31,7 +26,7 @@ class NotificationService
         }
     }
 
-    public static function setMarkAsReadNotification(string $notificationUuid, User $user)
+    public static function setMarkAsReadNotification(string $notificationUuid, JWTSubject $user): void
     {
         foreach ($user->notifications as $notification) {
 

@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Google\Cloud\Storage\StorageClient;
 
 class CloudController extends Controller
 {
-    public function store(UploadedFile $uploadedFile, string $newName)
+    public function store(UploadedFile $uploadedFile, string $newName): string
     {
         $storage = new StorageClient([
             'keyFilePath' => base_path(). '/zhlobin-6e019ecee572.json',
@@ -19,7 +17,7 @@ class CloudController extends Controller
         $bucket = $storage->bucket($bucketName);
         $filepath = public_path('assets/images/' . $newName);
         $bucket->upload(
-            fopen($filepath, 'r'),
+            fopen($filepath, 'rb'),
         );
 
         unlink(public_path('assets/images/' . $newName));
