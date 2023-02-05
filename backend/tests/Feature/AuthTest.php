@@ -10,7 +10,7 @@ use Tests\TestHelpers\TestHelperTrait;
 
 class AuthTest extends TestCase
 {
-    use RefreshDatabase;
+//    use RefreshDatabase;
     use WithFaker;
     use TestHelperTrait;
 
@@ -30,7 +30,7 @@ class AuthTest extends TestCase
      */
     public function test_login(): void
     {
-        $baseUrl = env('API_URL') . 'api/auth/login';
+        $baseUrl = 'api/auth/login';
         $email = 'admin@admin.com';
         $password = '12345678';
 
@@ -52,7 +52,7 @@ class AuthTest extends TestCase
     public function test_logout(): void
     {
         $token = $this->getAuthToken();
-        $baseUrl = env('API_URL') . 'api/auth/logout?token=' . $token;
+        $baseUrl = 'api/auth/logout?token=' . $token;
         $response = $this->json('GET', $baseUrl);
 
         $response

@@ -12,7 +12,7 @@ use Tests\TestHelpers\TestHelperTrait;
 
 class PersonalCabinetTest extends TestCase
 {
-    use RefreshDatabase;
+//    use RefreshDatabase;
     use WithFaker;
     use TestHelperTrait;
 
@@ -33,7 +33,6 @@ class PersonalCabinetTest extends TestCase
 
     /**
      * @return void
-     * @throws JsonException
      */
     public function test_get_articles(): void
     {
@@ -42,7 +41,7 @@ class PersonalCabinetTest extends TestCase
 
         $data = $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
-        ])->json('get', env('API_URL') . 'api/my-articles/')->getOriginalContent();
+        ])->json('get', 'api/my-articles')->getOriginalContent();
 
         $title = $data->first()->title;
 
@@ -71,7 +70,7 @@ class PersonalCabinetTest extends TestCase
 
         $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
-        ])->json('post', env('API_URL') . 'api/article/' . $article->id, $article->toArray());
+        ])->json('post', 'api/article/' . $article->id, $article->toArray());
 
         $this->assertDatabaseHas('articles', ['id' => $article->id, 'title' => 'Updated article']);
     }
