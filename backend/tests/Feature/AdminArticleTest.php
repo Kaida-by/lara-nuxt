@@ -11,7 +11,7 @@ use Tests\TestHelpers\TestHelperTrait;
 
 class AdminArticleTest extends TestCase
 {
-    use RefreshDatabase;
+//    use RefreshDatabase;
     use WithFaker;
     use TestHelperTrait;
 
@@ -36,7 +36,7 @@ class AdminArticleTest extends TestCase
     public function test_get_articles(): void
     {
         /** @var Article $article */
-        $article = $this->getNewArticleForPC();
+        $article = $this->getNewArticleForAP();
 
         $data = $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
