@@ -12,7 +12,7 @@ use Tests\TestHelpers\TestHelperTrait;
 
 class PersonalCabinetTest extends TestCase
 {
-//    use RefreshDatabase;
+    use RefreshDatabase;
     use WithFaker;
     use TestHelperTrait;
 
