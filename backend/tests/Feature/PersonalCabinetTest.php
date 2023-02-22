@@ -38,7 +38,7 @@ class PersonalCabinetTest extends TestCase
     public function test_get_articles(): void
     {
         /** @var Article $article */
-        $article = $this->getNewArticleForPC();
+        $article = $this->getNewArticleForPC($this->profile->id);
 
         $data = $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
