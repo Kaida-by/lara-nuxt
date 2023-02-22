@@ -58,12 +58,12 @@ trait TestHelperTrait
     /**
      * @return Collection|Model
      */
-    public function getNewArticleForAP(): Collection|Model
+    public function getNewArticleForAP(int $id): Collection|Model
     {
         return Article::factory()->create([
             'title' => 'test title1234',
             'description' => 'test description',
-            'author_id' => 1,
+            'author_id' => $id,
             'entity_type_id' => 1,
             'category_id' => 2,
             'status_id' => 1,
