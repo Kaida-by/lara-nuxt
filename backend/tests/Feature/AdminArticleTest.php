@@ -36,7 +36,7 @@ class AdminArticleTest extends TestCase
     public function test_get_articles(): void
     {
         /** @var Article $article */
-        $article = $this->getNewArticleForPC($this->profile->id);
+        $article = $this->getNewArticleForAP($this->profile->id);
 
         $data = $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
