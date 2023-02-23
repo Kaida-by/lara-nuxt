@@ -48,6 +48,7 @@ export default {
   margin-top: 10%;
   padding: 60px 0;
   border-radius: 20px;
+  overflow-y: auto;
 }
 .close {
   margin: 10% 0 0 16px;

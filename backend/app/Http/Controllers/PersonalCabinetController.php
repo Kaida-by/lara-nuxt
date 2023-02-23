@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Notifications\CreateEntityNotification;
 use App\Notifications\UpdateEntityNotification;
 use Illuminate\Support\Facades\Auth;
+use RuntimeException;
 use Throwable;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -63,26 +64,29 @@ class PersonalCabinetController extends Controller
         $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
 
         try {
-            DB::beginTransaction();
-        } catch (Throwable $e) {
-            dd($e);
-        }
-
-        try {
-
             $this->article->save();
-
             $currentId = Article::latest()->first()->id ?? 0;
 
             if ($request->files->get('files')) {
-                UploadImagesService::save(
-                    self::ENTITY_TYPE,
-                    $currentId,
-                    $request->files->get('files')
-                );
-            }
+                try {
+                    UploadImagesService::save(
+                        self::ENTITY_TYPE,
+                        $currentId,
+                        $request->files->get('files')
+                    );
+                } catch (RuntimeException|Exception $exception) {
+                    Article::destroy($currentId);
 
-            DB::commit();
+                    return response()->json([
+                        'success' => false,
+                        'errors' => [
+                            'text' => [
+                                $exception->getMessage()
+                            ]
+                        ]
+                    ], 500);
+                }
+            }
 
             /** @var User $user */
             $user = Auth::user();
@@ -94,8 +98,6 @@ class PersonalCabinetController extends Controller
                 'article' => $this->article
             ]);
         } catch (Exception $exception) {
-            DB::rollBack();
-
             return response()->json([
                 'success' => false,
                 'errors' => [
