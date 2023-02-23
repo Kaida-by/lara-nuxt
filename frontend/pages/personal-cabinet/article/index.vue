@@ -3,7 +3,7 @@
     <div class="articles">
       <div class="article" v-for="article in articles">
         <h2>{{ article.title }}</h2>
-        <p>{{ article.description }}</p>
+<!--        <p>{{ article.description }}</p>-->
         <nuxt-link :to="'/personal-cabinet/article/' + article.id">
           edit
         </nuxt-link>

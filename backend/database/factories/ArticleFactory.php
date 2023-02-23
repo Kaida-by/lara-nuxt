@@ -19,7 +19,7 @@ class ArticleFactory extends Factory
     {
         return [
             'title' => 'test title',
-            'description' => 'test description',
+            'description' => '<h3>test description</h3>',
             'author_id' => 1,
             'entity_type_id' => 1,
             'category_id' => 2,

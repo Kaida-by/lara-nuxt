@@ -8,22 +8,24 @@
         <div class="invalid-feedback" v-if="errors.title">{{ errors.title[0] }}</div>
 
         <label>Description: </label>
-        <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">
-        <div class="invalid-feedback" v-if="errors.description">{{ errors.description[0] }}</div>
+<!--        <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
+<!--        <div class="invalid-feedback" v-if="errors.description">{{ errors.description[0] }}</div>-->
 
-        <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>
+        <vue-editor v-model="form.description"></vue-editor>
 
-        <div class="images">
-          <span>Images:</span>
-          <div class="preview">
-            <draggable v-model="form.images" :animation="300" @start="drag=true" @end="drag=false">
-              <div class="img" v-for="(image, key) in form.images">
-                <img class="image_i" :src="image.src" alt="">
-                <span class="remove-file" v-on:click="removeFile( key )">✘</span>
-              </div>
-            </draggable>
-          </div>
-        </div>
+<!--        <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>-->
+
+<!--        <div class="images">-->
+<!--          <span>Images:</span>-->
+<!--          <div class="preview">-->
+<!--            <draggable v-model="form.images" :animation="300" @start="drag=true" @end="drag=false">-->
+<!--              <div class="img" v-for="(image, key) in form.images">-->
+<!--                <img class="image_i" :src="image.src" alt="">-->
+<!--                <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
+<!--              </div>-->
+<!--            </draggable>-->
+<!--          </div>-->
+<!--        </div>-->
 
         <input type="submit" value="Update">
       </form>
@@ -36,9 +38,13 @@
 
 <script>
 import _ from "lodash";
+import VueEditorComponent from '~/components/VueEditor'
 
 export default {
   // name: "article",
+  components: {
+    VueEditorComponent
+  },
   data() {
     return {
       form: {

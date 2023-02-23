@@ -8,8 +8,8 @@
             <img class="item_img" :src="article.images[0].src" alt="">
             <h2 v-if="article.title.length > 30">{{ article.title.substr(0, 33) }} ...</h2>
             <h2 v-else>{{ article.title }}</h2>
-            <p v-if="article.description.length > 67">{{ article.description.substr(0, 70) }} ...</p>
-            <p v-else>{{ article.description }}</p>
+<!--            <p v-if="article.description.length > 67">{{ article.description.substr(0, 70) }} ...</p>-->
+<!--            <p v-else>{{ article.description }}</p>-->
           </div>
         </nuxt-link>
         <nuxt-link v-else :to="'/articles/' + article.id">
@@ -18,8 +18,8 @@
             <img class="item_img" src="/public/assets/images/lg.jpg" alt="">
             <h2 v-if="article.title.length > 30">{{ article.title.substr(0, 33) }} ...</h2>
             <h2 v-else>{{ article.title }}</h2>
-            <p v-if="article.description.length > 67">{{ article.description.substr(0, 70) }} ...</p>
-            <p v-else>{{ article.description }}</p>
+<!--            <p v-if="article.description.length > 67">{{ article.description.substr(0, 70) }} ...</p>-->
+<!--            <p v-else>{{ article.description }}</p>-->
           </div>
         </nuxt-link>
       </div>
