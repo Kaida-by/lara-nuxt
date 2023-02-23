@@ -13,20 +13,25 @@ use Illuminate\Support\Str;
 
 class UploadImagesService
 {
+    /**
+     * @throws Exception
+     */
     public static function save(
         int $entity_type,
         int $entity_id,
         array $files = [],
         bool $is_local = true,
-    ): void
+    ): bool
     {
         foreach ($files as $key => $file) {
             try {
                 self::upload($file, $entity_type, $entity_id, $key + 1, $is_local);
             } catch (Exception $exception) {
-                dd($exception->getMessage());
+                throw new RuntimeException($exception);
             }
         }
+
+        return true;
     }
 
     /**
@@ -39,7 +44,7 @@ class UploadImagesService
         int $entity_id,
         int $order,
         bool $is_local,
-    ): void
+    ): bool
     {
         $permittedMimeTypes = ['image/jpeg', 'image/png'];
 
@@ -73,12 +78,13 @@ class UploadImagesService
             $image->order = $order;
             $image->is_local = $is_local ? 1 : 0;
 
-            $image->save();
+            return $image->save();
+        }
 
-        } else {
-            $image = Image::find($uploadedFile->id);
-            $image->order = $order;
-            $image->update();
+        $image = Image::find($uploadedFile->id);
+        $image->order = $order;
+
+        return $image->update();
 
 //            $imageIds = Article::with(['images'])
 //                ->where(['id' => $entity_id])
@@ -88,7 +94,6 @@ class UploadImagesService
 //                unlink(public_path() . '/../' . $image['src']);
 //                Image::destroy(['id' => $image['id']]);
 //            }
-        }
     }
 
     public static function getOriginalName(UploadedFile $uploadedFile): string

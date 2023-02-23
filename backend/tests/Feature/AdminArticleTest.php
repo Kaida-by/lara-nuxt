@@ -11,7 +11,7 @@ use Tests\TestHelpers\TestHelperTrait;
 
 class AdminArticleTest extends TestCase
 {
-//    use RefreshDatabase;
+    use RefreshDatabase;
     use WithFaker;
     use TestHelperTrait;
 
@@ -36,11 +36,11 @@ class AdminArticleTest extends TestCase
     public function test_get_articles(): void
     {
         /** @var Article $article */
-        $article = $this->getNewArticleForAP();
+        $article = $this->getNewArticleForAP($this->profile->id);
 
         $data = $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
-        ])->json('get', 'api/admin/articles')->getOriginalContent();
+        ])->json('get', env('API_URL') . 'api/admin/articles')->getOriginalContent();
 
         $title = $data->last()->title;
 
@@ -51,7 +51,7 @@ class AdminArticleTest extends TestCase
     {
         $data = $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
-        ])->json('get', 'api/admin/article-categories')->getOriginalContent();
+        ])->json('get', env('API_URL') . 'api/admin/article-categories')->getOriginalContent();
 
         $slug = $data['categories']->first()->slug;
 
@@ -66,7 +66,7 @@ class AdminArticleTest extends TestCase
 
         $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
-        ])->json('patch', 'api/admin/article/approve/' . $article->id, $input);
+        ])->json('patch', env('API_URL') . 'api/admin/article/approve/' . $article->id, $input);
 
         $this->assertDatabaseHas('articles', ['id' => $article->id, 'status_id' => 2]);
     }
@@ -78,7 +78,7 @@ class AdminArticleTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer '. $this->token,
-        ])->json('delete', 'api/admin/article/delete/' . $article->id);
+        ])->json('delete', env('API_URL') . 'api/admin/article/delete/' . $article->id);
 
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertDatabaseMissing('articles', ['id' => $article->id]);

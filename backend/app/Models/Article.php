@@ -18,6 +18,10 @@ class Article extends Model
     protected $fillable = [
         'title',
         'description',
+        'author_id',
+        'entity_type_id',
+        'category_id',
+        'status_id',
     ];
 
     protected $dates = [
