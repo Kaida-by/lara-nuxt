@@ -1,5 +1,5 @@
-<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-
+<?php
+/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Http\Controllers;
@@ -19,7 +19,6 @@ use Throwable;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\DB;
 use function response;
 
 class PersonalCabinetController extends Controller
@@ -145,36 +144,44 @@ class PersonalCabinetController extends Controller
      */
     public function update(ArticleRequest $request, Article $article): JsonResponse
     {
+        $tags = UploadImagesService::getTagsFromDescription($request->description);
+        $usedImagesUuid = UploadImagesService::getUsedImagesUuidFromHTMLTags($tags);
+        UploadImagesService::removeUnusedImages($article, $usedImagesUuid);
+
         try {
-            DB::beginTransaction();
+            $article->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'author_id' => $this->user()->profile->id,
+                'entity_type_id' => self::ENTITY_TYPE,
+                'category_id' => self::CATEGORY,
+                'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,
+            ]);
 
-            $article->update($request->except('images'));
+//
+//            $oldImages = $request->images;
+//            $images = [];
+//
+//            if ($oldImages) {
+//                foreach ($oldImages as $key => $image) {
+//                    if (is_string($image)) {
+//                        $oldImage = json_decode($image, false, 512, JSON_THROW_ON_ERROR);
+//                        $images[$key] = $oldImage;
+//                    } else {
+//                        $images[$key] = $image;
+//                    }
+//                }
+//            }
 
-            $oldImages = $request->images;
-            $images = [];
-
-            if ($oldImages) {
-                foreach ($oldImages as $key => $image) {
-                    if (is_string($image)) {
-                        $oldImage = json_decode($image, false, 512, JSON_THROW_ON_ERROR);
-                        $images[$key] = $oldImage;
-                    } else {
-                        $images[$key] = $image;
-                    }
-                }
-            }
-
-            UploadImagesService::deleteMissingImages($article, $images);
-
-            if ($images) {
-                UploadImagesService::save(
-                    self::ENTITY_TYPE,
-                    $article->id,
-                    $images
-                );
-            }
-
-            DB::commit();
+//            UploadImagesService::deleteMissingImages($article, $images);
+//
+//            if ($images) {
+//                UploadImagesService::save(
+//                    self::ENTITY_TYPE,
+//                    $article->id,
+//                    $images
+//                );
+//            }
 
             /** @var User $user */
             $user = Auth::user();
@@ -186,14 +193,39 @@ class PersonalCabinetController extends Controller
                 'data' => $request['images']
             ]);
         } catch (Exception $exception) {
-            DB::rollBack();
-
             return response()->json([
                 'success' => true,
                 'data' => $exception->getMessage()
             ]);
         } catch (Throwable $e) {
-            dd($e);
+            return response()->json([
+                'success' => true,
+                'data' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function createTemporaryArticle()
+    {
+        $this->article->title = '';
+        $this->article->description = '';
+        $this->article->author_id = $this->user()->profile->id;
+        $this->article->entity_type_id = self::ENTITY_TYPE;
+        $this->article->category_id = self::CATEGORY;
+        $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
+
+        try {
+            $this->article->save();
+
+            return response()->json([
+                'success' => true,
+                'data' => $this->article->id
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage()
+            ]);
         }
     }
 }

@@ -1,5 +1,6 @@
 <template>
   <div class="bg-white">
+    <breadcrumbs></breadcrumbs>
     <div class="container mx-auto w-100">
       <div class="article">
         <div class="profile">
@@ -31,7 +32,7 @@
           </el-row>
           <el-row>
             <span>Description: </span>
-            <span>{{ article.description }}</span>
+            <span v-html="article.description"></span>
           </el-row>
           <el-row>
             <span>Images: </span>
@@ -71,8 +72,14 @@
 </template>
 
 <script>
+
+import Breadcrumbs from "~/components/Breadcrumbs";
+
 export default {
   name: "id",
+  components: {
+    Breadcrumbs
+  },
   data() {
     return {
       article: {},

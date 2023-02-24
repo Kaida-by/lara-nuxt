@@ -5,21 +5,31 @@
       <label>Name: </label>
       <input v-model="form.title" type="text" name="name" :class="{ 'is-invalid': errors.title }" placeholder="title">
       <label>Description: </label>
-      <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">
 
-      <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>
+      <vue-editor
+        id="editor"
+        useCustomImageHandler
+        @image-added="handleImageAdded"
+        v-model="form.description"
+      >
 
-      <div class="preview">
-        <draggable v-model="files" :animation="300" @start="drag=true" @end="drag=false">
-          <div class="img" v-for="(image, key) in files">
-            <img class="image_i" :src="image.src" alt="">
-            <span class="remove-file" v-on:click="removeFile( key )">✘</span>
-          </div>
-        </draggable>
-      </div>
-      <div class="invalid-feedback" v-if="errors.text">
-        {{ errors.text[0] }}
-      </div>
+      </vue-editor>
+
+<!--      <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
+
+<!--      <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>-->
+
+<!--      <div class="preview">-->
+<!--        <draggable v-model="files" :animation="300" @start="drag=true" @end="drag=false">-->
+<!--          <div class="img" v-for="(image, key) in files">-->
+<!--            <img class="image_i" :src="image.src" alt="">-->
+<!--            <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
+<!--          </div>-->
+<!--        </draggable>-->
+<!--      </div>-->
+<!--      <div class="invalid-feedback" v-if="errors.text">-->
+<!--        {{ errors.text[0] }}-->
+<!--      </div>-->
       <input type="submit" value="Create">
     </form>
 
@@ -32,10 +42,14 @@
 <script>
 
 import _ from 'lodash'
+import VueEditorComponent from '~/components/VueEditor'
 
 export default {
   name: "create",
   middleware: 'auth',
+  components: {
+    VueEditorComponent
+  },
   data() {
     return {
       form: {
@@ -54,25 +68,43 @@ export default {
         name: undefined,
         file: undefined,
         src: undefined
-      }
+      },
+      cte_id: ''
     }
   },
   methods: {
     async create() {
       // if (this.files.length > 0) {
       let form = new FormData();
-      for ( var i = 0; i < this.files.length; i++ ) {
-        let file = this.files[i].file;
-        form.append('files[' + i + ']', file)
-      }
-      _.each(this.form, (value, key) => {
-        form.append(key, value)
-      });
+      // for ( var i = 0; i < this.files.length; i++ ) {
+      //   let file = this.files[i].file;
+      //   form.append('files[' + i + ']', file)
+      // }
+      // _.each(this.form, (value, key) => {
+      //   form.append(key, value)
+      // });
       // } else {
       //   await this.$axios.post('/article/store', this.form, {})
       // }
 
-      await this.$axios.post('/article/store', form, {})
+      // await this.$axios.post('/article/store', form, {})
+
+      await this.$axios.post('/article/' + this.cte_id, this.form, {})
+    },
+    async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
+      let formDataI = new FormData();
+
+      formDataI.append('file', file);
+      formDataI.append('entity_id', this.cte_id);
+      await this.$axios.post('/upload-image', formDataI)
+        .then(result => {
+          const url = result.data[0].src; // Get url from response
+          Editor.insertEmbed(cursorLocation, 'image', 'http://zhlo.loc' + url);
+          resetUploader();
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     handleImages(e) {
       const files = e.target.files || e.dataTransfer.files
@@ -89,7 +121,19 @@ export default {
     },
     removeFile( key ) {
       this.files.splice( key, 1 );
+    },
+    async createTemporaryArticle() {
+      await this.$axios.post('/article-cte', {}, {})
+        .then(result => {
+          this.cte_id = result.data.data
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
+  },
+  mounted() {
+    this.createTemporaryArticle()
   }
 }
 </script>

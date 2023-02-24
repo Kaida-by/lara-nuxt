@@ -28,7 +28,7 @@ class ArticleRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
+            'description' => 'required|string|max:65000',
 //            'images' => 'sometimes|array',
 //            'images.*' => 'required|array',
 //            'images.*.id' => 'required_without:images.*.name,images.*.src|integer',
@@ -45,7 +45,7 @@ class ArticleRequest extends FormRequest
             'title.max' => 'Поле "заголовок" должно быть не более 255 символов',
             'description.required' => 'Поле "описание" обязательно',
             'description.string' => 'Поле "описание" должно быть строкой',
-            'description.max' => 'Поле "описание" должно быть не более 255 символов',
+            'description.max' => 'Поле "описание" должно быть не более 65000 символов',
         ];
     }
 }

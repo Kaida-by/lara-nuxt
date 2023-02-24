@@ -9,6 +9,7 @@ use App\Http\Controllers\api\Auth\SocialLoginController;
 use App\Http\Controllers\api\MeController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\PersonalCabinetController;
+use App\Http\Controllers\UploadImageController;
 use Illuminate\Broadcasting\BroadcastController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,11 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/article/edit/{id}' ,[PersonalCabinetController::class, 'edit'])->name('article.edit');
     Route::post('/article/store', [PersonalCabinetController::class, 'store'])->name('article.store');
     Route::post('/article/{article}', [PersonalCabinetController::class, 'update'])->name('article.update');
+    Route::post('/upload-image/', [UploadImageController::class, 'upload'])->name('image.upload');
+
+    //Create temporary Entity
+    Route::post('/article-cte', [PersonalCabinetController::class, 'createTemporaryArticle'])->name('article.cte');
+    Route::get('/get-last-article-cte', [PersonalCabinetController::class, 'getLastArticle'])->name('last.article.cte');
 });
 
 Route::group(['prefix' => '/admin'], function () {

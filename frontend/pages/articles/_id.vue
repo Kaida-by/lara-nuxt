@@ -11,9 +11,8 @@
             <el-image :src="article.images[0].src" alt="" :preview-src-list="[article.images[0].src]" fit=cover>
             </el-image>
           </div>
-          <div class="med_art_text">
-            {{ article.description }}
-          </div>
+          <div class="med_art_text" v-html="article.description"></div>
+
           <div class="bot_art_images">
             <div class="bot_art_image_in" v-for="image in article.images">
               <el-image :src=image.src alt="img" :preview-src-list="[image.src]" fit=cover>

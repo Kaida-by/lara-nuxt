@@ -5,7 +5,11 @@ namespace App\Http\Services;
 use App\Http\Controllers\CloudController;
 use App\Models\Article;
 use App\Models\Image;
+use DOMDocument;
+use DOMNode;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use RecursiveIteratorIterator;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -21,17 +25,19 @@ class UploadImagesService
         int $entity_id,
         array $files = [],
         bool $is_local = true,
-    ): bool
+    ): Image
     {
+        $is_upload = false;
+
         foreach ($files as $key => $file) {
             try {
-                self::upload($file, $entity_type, $entity_id, $key + 1, $is_local);
+                $is_upload = self::upload($file, $entity_type, $entity_id, $key + 1, $is_local);
             } catch (Exception $exception) {
                 throw new RuntimeException($exception);
             }
         }
 
-        return true;
+        return $is_upload;
     }
 
     /**
@@ -44,7 +50,7 @@ class UploadImagesService
         int $entity_id,
         int $order,
         bool $is_local,
-    ): bool
+    ): Image
     {
         $permittedMimeTypes = ['image/jpeg', 'image/png'];
 
@@ -78,13 +84,16 @@ class UploadImagesService
             $image->order = $order;
             $image->is_local = $is_local ? 1 : 0;
 
-            return $image->save();
+            $image->save();
+
+            return $image;
         }
 
         $image = Image::find($uploadedFile->id);
         $image->order = $order;
+        $image->update();
 
-        return $image->update();
+        return $image;
 
 //            $imageIds = Article::with(['images'])
 //                ->where(['id' => $entity_id])
@@ -107,10 +116,10 @@ class UploadImagesService
         return Str::slug($originalName);
     }
 
-    public static function getSrc(UploadedFile $uploadedFile): string
-    {
-        return config('filesystems.file_src') . $uploadedFile->getClientOriginalName();
-    }
+//    public static function getSrc(UploadedFile $uploadedFile): string
+//    {
+//        return config('filesystems.file_src') . $uploadedFile->getClientOriginalName();
+//    }
 
 //    public static function update(array $files, int $entity_type, int $entity_id, string $newMainImageUuid)
 //    {
@@ -140,15 +149,120 @@ class UploadImagesService
 //        }
 //    }
 
-    public static function deleteMissingImages (Article $article, array $images): void
-    {
-        $imageIds = array_column($images, 'id');
-        $imagesForDelete = $article->images()->whereNotIn('id', $imageIds);
+//    public static function deleteMissingImages (Article $article, array $images): void
+//    {
+//        $imageIds = array_column($images, 'id');
+//        $imagesForDelete = $article->images()->whereNotIn('id', $imageIds);
+//
+//        foreach ($imagesForDelete->get() as $image) {
+//            unlink(public_path() . '/../' . $image->src);
+//        }
+//
+//        $imagesForDelete->delete();
+//    }
 
-        foreach ($imagesForDelete->get() as $image) {
-            unlink(public_path() . '/../' . $image->src);
+    /**
+     * @param string $description
+     * @return array
+     */
+    public static function getTagsFromDescription(string $description): array
+    {
+        $dom = new DOMDocument;
+        $dom->loadHTML($description);
+
+        $output = [];
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDOMIterator($dom),
+            RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach($iterator as $node) {
+            if ($node->nodeType === XML_ELEMENT_NODE && ($node->nodeName !== 'html' && $node->nodeName !== 'body')) {
+                $output[] = array(
+                    'name' => $node->nodeName,
+                    'value' => trim(self::getInnerHTML($node), PHP_EOL));
+            }
         }
 
-        $imagesForDelete->delete();
+        return $output;
+    }
+
+    /**
+     * @param DOMNode $element
+     * @return string
+     */
+    public static function getInnerHTML(DOMNode $element): string
+    {
+        $innerHTML = '';
+        $children  = $element->childNodes;
+
+        foreach ($children as $child) {
+            $innerHTML .= $element->ownerDocument->saveHTML($child);
+        }
+
+        return $innerHTML;
+    }
+
+    public static function getUsedImagesUuidFromHTMLTags(array $tags): array
+    {
+        $imagesName = [];
+
+        foreach ($tags as $tag) {
+            if ($tag['name'] === 'img' && $tag['value']) {
+                $path = self::getImageFileNameFromTag($tag['value']);
+                $fileName = self::getImageFileUuidFromPath($path);
+                $imagesName[] = $fileName;
+            } elseif ($tag['value'] && is_int(strpos($tag['value'], '<img'))) {
+                $path = self::getImageFileNameFromTag($tag['value']);
+                $fileName = self::getImageFileUuidFromPath($path);
+                $imagesName[] = $fileName;
+            }
+        }
+
+        return $imagesName;
+    }
+
+    /**
+     * @param array $usedImages
+     * @return void
+     */
+    public static function removeUnusedImages(Article $article, array $usedImages): void
+    {
+        $allUserImages = $article?->images;
+
+        /** @var Image $userImage */
+        foreach ($allUserImages as $userImage) {
+            $uuidImageInDB = self::getImageFileUuidFromPath($userImage->src);
+
+            if (
+                !in_array($uuidImageInDB, $usedImages, true) &&
+                unlink(public_path() . '/../' . $userImage->src)
+            ) {
+                $userImage->delete();
+            }
+        }
+    }
+
+    /**
+     * @param string $tag
+     * @return string
+     */
+    public static function getImageFileNameFromTag(string $tag): string
+    {
+        preg_match('~(?<=src=")[^"]+(?=")~', $tag, $arr);
+
+        return $arr[0] ?? '';
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public static function getImageFileUuidFromPath(string $path): string
+    {
+        $partsPath = explode('/', $path);
+        $partsName = explode('.', end($partsPath));
+
+        return head($partsName);
     }
 }

@@ -63,7 +63,8 @@ export default {
     '@nuxtjs/auth-next',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/laravel-echo',
-    '@nuxtjs/dotenv'
+    '@nuxtjs/dotenv',
+    'vue2-editor/nuxt'
   ],
 
   echo: {

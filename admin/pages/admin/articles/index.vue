@@ -18,8 +18,9 @@
           :data="articles.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
           style="width: 100%">
           <el-table-column label="Title" prop="title"></el-table-column>
-          <el-table-column label="Description" prop="description"></el-table-column>
-<!--          Search-->
+          <el-table-column label="User email" prop="user.email"></el-table-column>
+<!--          <el-table-column label="Description" prop="description"></el-table-column>-->
+          Search
           <el-table-column
             align="right">
             <template slot="header" slot-scope="scope">

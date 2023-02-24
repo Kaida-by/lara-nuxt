@@ -32,7 +32,8 @@ class AdminArticleController extends Controller
             'images' => function($q) {
                 $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
             },
-            'entityStatus'
+            'entityStatus',
+            'user'
         ])
             ->simplePaginate(10);
 
