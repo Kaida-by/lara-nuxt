@@ -11,7 +11,14 @@
 <!--        <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
 <!--        <div class="invalid-feedback" v-if="errors.description">{{ errors.description[0] }}</div>-->
 
-        <vue-editor v-model="form.description"></vue-editor>
+        <vue-editor
+          id="editor"
+          useCustomImageHandler
+          @image-added="handleImageAdded"
+          v-model="form.description"
+        >
+
+        </vue-editor>
 
 <!--        <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>-->
 
@@ -72,20 +79,20 @@ export default {
     async update() {
       try {
         let form = new FormData();
-        _.each(this.form, (value, key) => {
-          if (key === 'images') {
-            for (var i = 0; i < this.form.images.length; i++) {
-              let file = this.form.images[i].file;
-              if (file) {
-                form.append('images[' + i + ']', file)
-              } else {
-                form.append('images[' + i + ']', JSON.stringify(this.form.images[i]))
-              }
-            }
-          } else {
-            form.append(key, value)
-          }
-        });
+        // _.each(this.form, (value, key) => {
+        //   if (key === 'images') {
+        //     for (var i = 0; i < this.form.images.length; i++) {
+        //       let file = this.form.images[i].file;
+        //       if (file) {
+        //         form.append('images[' + i + ']', file)
+        //       } else {
+        //         form.append('images[' + i + ']', JSON.stringify(this.form.images[i]))
+        //       }
+        //     }
+        //   } else {
+        //     form.append(key, value)
+        //   }
+        // });
 
         // _.each(this.form, (value, key) => {
         //   form.append(key, value)
@@ -94,7 +101,8 @@ export default {
         // for (let value of form.values()) {
         //   console.log(value);
         // }
-        await this.$axios.post('/article/' + this.$route.params.id, form, {})
+
+        await this.$axios.post('/article/' + this.$route.params.id, this.form, {})
       } catch(e) {
         return;
       }
@@ -112,6 +120,21 @@ export default {
     },
     removeFile( key ) {
       this.form.images.splice( key, 1 );
+    },
+    async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
+      let formDataI = new FormData();
+
+      formDataI.append('file', file);
+      formDataI.append('entity_id', this.$route.params.id);
+      await this.$axios.post('/upload-image', formDataI)
+        .then(result => {
+          const url = result.data[0].src; // Get url from response
+          Editor.insertEmbed(cursorLocation, 'image', 'http://zhlo.loc' + url);
+          resetUploader();
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   },
   mounted () {

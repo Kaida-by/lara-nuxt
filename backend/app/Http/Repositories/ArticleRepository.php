@@ -33,10 +33,10 @@ class ArticleRepository implements ArticleRepositoryInterface
         $article = Article::with([
             'user' => function($q) {
                 $q->with([
-                    'profile' => function ($p) {
-                        $p->with([
-                            'images' => function ($pi) {
-                                $pi->where(['entity_type_id' => 3]);
+                    'profile' => function ($q) {
+                        $q->with([
+                            'images' => function ($q) {
+                                $q->where(['entity_type_id' => 3]);
                             }
                         ]);
                     }

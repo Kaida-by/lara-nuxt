@@ -85,6 +85,6 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
-    'file_src' => public_path('assets/images/'),
-    'file_src_image_path' => '/public/assets/images/',
+    'file_src' => public_path('assets/images/uploads/'),
+    'file_src_image_path' => '/public/assets/images/uploads/',
 ];
