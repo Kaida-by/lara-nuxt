@@ -19,6 +19,11 @@ class UploadImageController extends Controller
                     $request->entity_id,
                     [$request->files->get('file')]
                 );
+
+                return response()->json([
+                    'success' => true,
+                    $image
+                ]);
             } catch (RuntimeException|Exception $exception) {
                 return response()->json([
                     'success' => false,
@@ -33,7 +38,7 @@ class UploadImageController extends Controller
 
         return response()->json([
             'success' => false,
-            $image
+            'message' => 'Something went wrong'
         ]);
     }
 }

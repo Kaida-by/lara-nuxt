@@ -71,7 +71,7 @@ class UploadImagesService
                 $cloud = new CloudController();
                 $url = $cloud->store($uploadedFile, $newName);
             } else {
-                $url = config('filesystems.file_src_image_path') . $newName;
+                $url = config('filesystems.file_src') . $newName;
             }
 
             $image = new Image();
