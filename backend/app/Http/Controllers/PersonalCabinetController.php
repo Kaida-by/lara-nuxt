@@ -144,7 +144,7 @@ class PersonalCabinetController extends Controller
      */
     public function update(ArticleRequest $request, Article $article): JsonResponse
     {
-        $tags = UploadImagesService::getTagsFromDescription($request->description);
+        $tags = EntityHelper::getTagsFromDescription($request->description);
         $usedImagesUuid = UploadImagesService::getUsedImagesUuidFromHTMLTags($tags);
         UploadImagesService::removeUnusedImages($article, $usedImagesUuid);
 
@@ -158,7 +158,15 @@ class PersonalCabinetController extends Controller
                 'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,
             ]);
 
-//
+            UploadImagesService::upload(
+                $request->files->get('file'),
+                self::ENTITY_TYPE,
+                $article->id,
+                1,
+                true,
+                true
+            );
+
 //            $oldImages = $request->images;
 //            $images = [];
 //

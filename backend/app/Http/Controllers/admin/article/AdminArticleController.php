@@ -117,7 +117,7 @@ class AdminArticleController extends Controller
                     $image = Image::find($image['id']);
 
                     if ($image['is_local'] === 1) {
-                        unlink(public_path() . '/../' . $image['src']);
+                        unlink(public_path() . '/' . $image['src']);
                     }
 
                     Image::destroy(['id' => $image['id']]);

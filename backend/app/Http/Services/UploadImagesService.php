@@ -5,11 +5,7 @@ namespace App\Http\Services;
 use App\Http\Controllers\CloudController;
 use App\Models\Article;
 use App\Models\Image;
-use DOMDocument;
-use DOMNode;
 use Exception;
-use Illuminate\Support\Facades\Auth;
-use RecursiveIteratorIterator;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -71,7 +67,7 @@ class UploadImagesService
                 $cloud = new CloudController();
                 $url = $cloud->store($uploadedFile, $newName);
             } else {
-                $url = config('filesystems.file_src') . $newName;
+                $url = config('filesystems.file_src_image_path') . $newName;
             }
 
             $image = new Image();
@@ -161,48 +157,6 @@ class UploadImagesService
 //        $imagesForDelete->delete();
 //    }
 
-    /**
-     * @param string $description
-     * @return array
-     */
-    public static function getTagsFromDescription(string $description): array
-    {
-        $dom = new DOMDocument;
-        $dom->loadHTML($description);
-
-        $output = [];
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDOMIterator($dom),
-            RecursiveIteratorIterator::SELF_FIRST);
-
-        foreach($iterator as $node) {
-            if ($node->nodeType === XML_ELEMENT_NODE && ($node->nodeName !== 'html' && $node->nodeName !== 'body')) {
-                $output[] = array(
-                    'name' => $node->nodeName,
-                    'value' => trim(self::getInnerHTML($node), PHP_EOL));
-            }
-        }
-
-        return $output;
-    }
-
-    /**
-     * @param DOMNode $element
-     * @return string
-     */
-    public static function getInnerHTML(DOMNode $element): string
-    {
-        $innerHTML = '';
-        $children  = $element->childNodes;
-
-        foreach ($children as $child) {
-            $innerHTML .= $element->ownerDocument->saveHTML($child);
-        }
-
-        return $innerHTML;
-    }
-
     public static function getUsedImagesUuidFromHTMLTags(array $tags): array
     {
         $imagesName = [];
@@ -223,12 +177,13 @@ class UploadImagesService
     }
 
     /**
+     * @param Article $article
      * @param array $usedImages
      * @return void
      */
     public static function removeUnusedImages(Article $article, array $usedImages): void
     {
-        $allUserImages = $article?->images;
+        $allUserImages = $article->images;
 
         /** @var Image $userImage */
         foreach ($allUserImages as $userImage) {
@@ -236,7 +191,7 @@ class UploadImagesService
 
             if (
                 !in_array($uuidImageInDB, $usedImages, true) &&
-                unlink(public_path() . '/../' . $userImage->src)
+                unlink(public_path() . '/' . $userImage->src)
             ) {
                 $userImage->delete();
             }
