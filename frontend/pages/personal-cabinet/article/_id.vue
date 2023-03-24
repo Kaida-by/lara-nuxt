@@ -25,8 +25,8 @@
 <!--        <div class="images">-->
 <!--          <span>Images:</span>-->
 <!--          <div class="preview">-->
-<!--            <draggable v-model="form.images" :animation="300" @start="drag=true" @end="drag=false">-->
-<!--              <div class="img" v-for="(image, key) in form.images">-->
+<!--            <draggable v-model="form.mainImageUrl" :animation="300" @start="drag=true" @end="drag=false">-->
+<!--              <div class="img" v-for="(image, key) in form.mainImageUrl">-->
 <!--                <img class="image_i" :src="image.src" alt="">-->
 <!--                <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
 <!--              </div>-->
@@ -57,7 +57,7 @@ export default {
       form: {
         title: '',
         description: '',
-        images: [],
+        mainImageUrl: [],
       },
       newFile: {},
       file: '',
@@ -80,13 +80,13 @@ export default {
       try {
         let form = new FormData();
         // _.each(this.form, (value, key) => {
-        //   if (key === 'images') {
-        //     for (var i = 0; i < this.form.images.length; i++) {
-        //       let file = this.form.images[i].file;
+        //   if (key === 'mainImageUrl') {
+        //     for (var i = 0; i < this.form.mainImageUrl.length; i++) {
+        //       let file = this.form.mainImageUrl[i].file;
         //       if (file) {
-        //         form.append('images[' + i + ']', file)
+        //         form.append('mainImageUrl[' + i + ']', file)
         //       } else {
-        //         form.append('images[' + i + ']', JSON.stringify(this.form.images[i]))
+        //         form.append('mainImageUrl[' + i + ']', JSON.stringify(this.form.mainImageUrl[i]))
         //       }
         //     }
         //   } else {
@@ -107,20 +107,20 @@ export default {
         return;
       }
     },
-    handleImages(e) {
-      const files = e.target.files || e.dataTransfer.files
-      for(let i = 0; i < files.length; i++) {
-        let reader = new FileReader()
-        reader.onload = (e) => {
-          this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
-          this.form.images.push(this.newFile)
-        }
-        reader.readAsDataURL(files[i])
-      }
-    },
-    removeFile( key ) {
-      this.form.images.splice( key, 1 );
-    },
+    // handleImages(e) {
+    //   const files = e.target.files || e.dataTransfer.files
+    //   for(let i = 0; i < files.length; i++) {
+    //     let reader = new FileReader()
+    //     reader.onload = (e) => {
+    //       this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
+    //       this.form.mainImageUrl.push(this.newFile)
+    //     }
+    //     reader.readAsDataURL(files[i])
+    //   }
+    // },
+    // removeFile( key ) {
+    //   this.form.mainImageUrl.splice( key, 1 );
+    // },
     async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
       let formDataI = new FormData();
 
@@ -129,13 +129,13 @@ export default {
       await this.$axios.post('/upload-image', formDataI)
         .then(result => {
           const url = result.data[0].src; // Get url from response
-          Editor.insertEmbed(cursorLocation, 'image', 'http://zhlo.loc' + url);
+          Editor.insertEmbed(cursorLocation, 'image', process.env.API_URL_PUBLIC + url);
           resetUploader();
         })
         .catch(err => {
           console.log(err);
         });
-    }
+    },
   },
   mounted () {
     this.fetchData()

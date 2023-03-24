@@ -4,6 +4,18 @@
     <form @submit.prevent="create">
       <label>Name: </label>
       <input v-model="form.title" type="text" name="name" :class="{ 'is-invalid': errors.title }" placeholder="title">
+
+<!--      <div><input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)"></div>-->
+
+<!--      <div class="preview">-->
+<!--        <draggable v-model="form.mainFile" :animation="300" @start="drag=true" @end="drag=false">-->
+<!--          <div class="img" v-for="(image, key) in form.mainFile">-->
+<!--            <img class="image_i" :src="image.src" alt="">-->
+<!--            <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
+<!--          </div>-->
+<!--        </draggable>-->
+<!--      </div>-->
+
       <label>Description: </label>
 
       <vue-editor
@@ -12,10 +24,7 @@
         @image-added="handleImageAdded"
         v-model="form.description"
       >
-
       </vue-editor>
-
-<!--      <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
 
 <!--      <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>-->
 
@@ -27,6 +36,9 @@
 <!--          </div>-->
 <!--        </draggable>-->
 <!--      </div>-->
+
+<!--      <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
+
 <!--      <div class="invalid-feedback" v-if="errors.text">-->
 <!--        {{ errors.text[0] }}-->
 <!--      </div>-->
@@ -56,11 +68,11 @@ export default {
         title: '',
         description: '',
         author_id: this.$auth.user.id,
+        // mainFile: [],
       },
       file: '',
       showPreview: false,
       imagePreview: [],
-      files: [],
       img: '',
       error: this.$route.query.error,
       newFiles: [],
@@ -74,21 +86,27 @@ export default {
   },
   methods: {
     async create() {
-      // if (this.files.length > 0) {
-      let form = new FormData();
-      // for ( var i = 0; i < this.files.length; i++ ) {
-      //   let file = this.files[i].file;
-      //   form.append('files[' + i + ']', file)
+      // this.form.file = this.$refs.files.files[0];
+      // console.log(this.form.file)
+      // if (this.form.mainFile.length > 0) {
+      //   let form = new FormData();
+      //   for (let i = 0; i < this.form.mainFile.length; i++) {
+      //     let file = this.form.mainFile[i].file;
+      //     form.append('files[' + i + ']', file)
+      //   }
+      //   _.each(this.form, (value, key) => {
+      //     form.append(key, value)
+      //   });
       // }
-      // _.each(this.form, (value, key) => {
-      //   form.append(key, value)
-      // });
-      // } else {
-      //   await this.$axios.post('/article/store', this.form, {})
+      // let form = new FormData();
+      // if (this.form.mainFile.length > 0) {
+      //   let file = this.form.mainFile[0].file;
+      //   form.append('file', file)
+      //   _.each(this.form, (value, key) => {
+      //     form.append(key, value)
+      //   });
       // }
-
       // await this.$axios.post('/article/store', form, {})
-
       await this.$axios.post('/article/' + this.cte_id, this.form, {})
     },
     async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
@@ -99,29 +117,31 @@ export default {
       await this.$axios.post('/upload-image', formDataI)
         .then(result => {
           const url = result.data[0].src; // Get url from response
-          Editor.insertEmbed(cursorLocation, 'image', 'http://zhlo.loc' + url);
+          Editor.insertEmbed(cursorLocation, 'image', process.env.API_URL_PUBLIC + url);
           resetUploader();
         })
         .catch(err => {
           console.log(err);
         });
     },
-    handleImages(e) {
-      const files = e.target.files || e.dataTransfer.files
-
-      for(let i = 0; i < files.length; i++) {
-        let reader = new FileReader()
-        reader.onload = (e) => {
-          this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
-          this.files.push(this.newFile)
-        }
-
-        reader.readAsDataURL(files[i])
-      }
-    },
-    removeFile( key ) {
-      this.files.splice( key, 1 );
-    },
+    // handleImages(e) {
+    //   const files = e.target.files || e.dataTransfer.files
+    //   let reader = new FileReader()
+    //   reader.readAsDataURL(files[0])
+    //   this.form.mainFile = [];
+    //   for(let i = 0; i < files.length; i++) {
+    //     let reader = new FileReader()
+    //     reader.onload = (e) => {
+    //       this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
+    //       this.form.mainFile.push(this.newFile)
+    //     }
+    //
+    //     reader.readAsDataURL(files[i])
+    //   }
+    // },
+    // removeFile( key ) {
+    //   this.form.mainFile.splice( key, 1 );
+    // },
     async createTemporaryArticle() {
       await this.$axios.post('/article-cte', {}, {})
         .then(result => {

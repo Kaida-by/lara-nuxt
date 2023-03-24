@@ -114,6 +114,14 @@ class DatabaseSeeder extends Seeder
         $profile['created_at'] = Carbon::now();
         $profile['updated_at'] = Carbon::now();
 
+        //add phone admin
+
+        $phone['id'] = 1;
+        $phone['code'] = 29;
+        $phone['number'] = 1234567;
+        $phone['entity_type_id'] = 3;
+        $phone['entity_id'] = 1;
+
         //add test admin
 
         DB::table('user_status')->insert($statuses);
@@ -124,5 +132,6 @@ class DatabaseSeeder extends Seeder
         DB::table('entity_status')->insert($entity_statuses);
         DB::table('users')->insert($user);
         DB::table('profiles')->insert($profile);
+        DB::table('phones')->insert($phone);
     }
 }
