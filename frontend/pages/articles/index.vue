@@ -75,6 +75,10 @@ export default {
   .article {
     display: flex;
   }
+  .article a {
+    width: 100%;
+    display: block;
+  }
   .article p {
     display: flex;
     align-items: center;
@@ -105,8 +109,9 @@ export default {
     background-color: white;
     overflow: hidden;
   }
-  .item img {
+  .articles .item img {
     margin-bottom: 15px;
+    width: 100%;
   }
   .item h2,
   .item p {
