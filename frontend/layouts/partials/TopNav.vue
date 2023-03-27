@@ -2,7 +2,7 @@
   <div class="container header-container">
     <div class="header_flex">
       <div class="logo">
-        <nuxt-link to="/">JWT-Auth</nuxt-link>
+        <nuxt-link to="/">Home</nuxt-link>
       </div>
       <div class="header-sdk" v-if="$auth.loggedIn">
         <div>
@@ -24,10 +24,11 @@
       </div>
     </div>
     <div class="bot_header_flex">
-      <div>
-        <div>
-          <nuxt-link to="/articles">Articles</nuxt-link>
-        </div>
+      <div class="bot_header_in">
+        <nuxt-link to="/articles">Articles</nuxt-link>
+      </div>
+      <div class="bot_header_in">
+        <nuxt-link to="#">Some link</nuxt-link>
       </div>
     </div>
   </div>
@@ -64,5 +65,10 @@ export default {
   .header_flex {
     display: flex;
     justify-content: space-between;
+  }
+  .bot_header_flex {
+    display: flex;
+    column-gap: 10px;
+    background-color: #b4c1d9;
   }
 </style>
