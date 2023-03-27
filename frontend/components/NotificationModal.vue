@@ -2,11 +2,11 @@
   <transition name="modal-fade">
     <div class="modal-overlay" @click="$emit('close-modal')">
       <div class="modal" @click.stop>
-        <div class="notification222" v-for="(notification) in notifications">
+        <div class="notification" v-for="(notification) in notifications">
           <span>
             {{ notification.data.message }}
           </span>
-          <span @click="$emit('remove-notification', notification.id)">✘</span>
+          <span class="bnt-cl" @click="$emit('remove-notification', notification.id)">✘</span>
           <div>
             <span class="text-gray-300">{{ notification.created_at }}</span>
           </div>
@@ -39,14 +39,15 @@ export default {
   display: flex;
   justify-content: center;
   background-color: #000000da;
+  z-index: 9;
 }
 .modal {
-  text-align: center;
+  text-align: left;
   background-color: white;
   height: 500px;
   width: 500px;
   margin-top: 10%;
-  padding: 60px 0;
+  padding: 60px 20px;
   border-radius: 20px;
   overflow-y: auto;
 }
@@ -87,4 +88,16 @@ button {
 .modal-fade-leave-active {
   transition: opacity 0.5s ease;
 }
+.notification {
+  position: relative;
+}
+.notification span {
+  font-family: monospace;
+}
+.bnt-cl {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
 </style>
+

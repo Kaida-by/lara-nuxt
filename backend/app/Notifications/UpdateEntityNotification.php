@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Http\Services\NotificationService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -36,7 +37,10 @@ class UpdateEntityNotification extends Notification
     public function toArray(): array
     {
         return [
-            'message' => 'Your ' . $this->typeEntity . ' "' . $this->nameEntity . '" was updated!'
+            'message' => 'Your ' .
+                $this->typeEntity . ' "' .
+                NotificationService::getEntityNameForNotification($this->nameEntity) .
+                '" was updated!'
         ];
     }
 }

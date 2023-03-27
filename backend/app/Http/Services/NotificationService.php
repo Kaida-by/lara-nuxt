@@ -35,4 +35,13 @@ class NotificationService
             }
         }
     }
+
+    public static function getEntityNameForNotification(string $message): string
+    {
+        if (strlen($message) > 12) {
+            return substr($message, 0 , 12) . '...';
+        }
+
+        return $message;
+    }
 }

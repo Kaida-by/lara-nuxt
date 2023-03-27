@@ -16,14 +16,26 @@ class ArticleRepository implements ArticleRepositoryInterface
 {
     public function showAll(): AnonymousResourceCollection
     {
-        $articles = Article::with([
-            'images' => function($q) {
-                $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
-            }
-        ])
-            ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
-            ->orderBy('created_at', 'DESC')
-            ->simplePaginate(4);
+        $count = (int) request('count');
+        if ($count && $count <= 24) {
+            $articles = Article::with([
+                'images' => function($q) {
+                    $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
+                }
+            ])
+                ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+                ->orderBy('created_at', 'DESC')
+                ->simplePaginate($count);
+        } else {
+            $articles = Article::with([
+                'images' => function($q) {
+                    $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
+                }
+            ])
+                ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+                ->orderBy('created_at', 'DESC')
+                ->simplePaginate(4);
+        }
 
         return ArticleResource::collection($articles);
     }
