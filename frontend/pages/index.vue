@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <h1>Home</h1>
     <nuxt-link to="/articles">Articles</nuxt-link>
     <articles count="4" is_main=true></articles>
   </div>
