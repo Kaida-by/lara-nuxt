@@ -28,7 +28,7 @@
         <nuxt-link to="/articles">Articles</nuxt-link>
       </div>
       <div class="bot_header_in">
-        <nuxt-link to="#">Some link</nuxt-link>
+        <nuxt-link to="/posters">Posters</nuxt-link>
       </div>
     </div>
   </div>

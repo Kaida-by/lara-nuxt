@@ -1,14 +1,16 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
 
-namespace App\Http\Controllers\admin\article;
+/** @noinspection PhpMultipleClassDeclarationsInspection */
+
+namespace App\Http\Controllers\Admin\Posters;
 
 use App\Events\Notifications;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AdminArticleRequest;
-use App\Http\Resources\ArticleResource;
+use App\Http\Requests\AdminEntityRequest;
+use App\Http\Resources\PosterResource;
 use App\Http\Services\EntityHelper;
-use App\Models\Article;
 use App\Models\Image;
+use App\Models\Poster;
 use App\Models\User;
 use App\Notifications\DeleteEntityNotification;
 use App\Notifications\PublishEntityNotification;
@@ -21,41 +23,22 @@ use Throwable;
 
 use function response;
 
-class AdminArticleController extends Controller
+class AdminPosterController extends Controller
 {
-    public const CATEGORY = 2;
-    public const ENTITY_NAME = 'article';
+    public const ENTITY_NAME = 'poster';
 
     public function showAll(): AnonymousResourceCollection
     {
-        $articles = Article::with([
+        $posters = Poster::with([
             'images' => function($q) {
-                $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
+                $q->where('entity_type_id', EntityHelper::TYPE_POSTERS);
             },
             'entityStatus',
             'user'
         ])
             ->simplePaginate(10);
 
-        return ArticleResource::collection($articles);
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    public function getCategories(): JsonResponse
-    {
-        $categories = DB::table('categories', 'cat')
-            ->select(['cat.id', 'cat.title', 'cat.slug', DB::raw('count(category_id) as cat')])
-            ->leftJoin('article_category', 'cat.id', '=', 'category_id')
-            ->where('category_type_id', self::CATEGORY)
-            ->groupBy(['category_id', 'cat.id', 'cat.title'])
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'categories' => $categories
-        ]);
+        return PosterResource::collection($posters);
     }
 
     /**
@@ -64,7 +47,7 @@ class AdminArticleController extends Controller
      */
     public function edit(int $id): JsonResponse
     {
-        $article = Article::with([
+        $poster = Poster::with([
             'user' => function($q) {
                 $q->with(['profile']);
             },
@@ -78,22 +61,22 @@ class AdminArticleController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $article
+            'data' => $poster
         ]);
     }
 
-    public function approve(int $id, AdminArticleRequest $request): void
+    public function approve(int $id, AdminEntityRequest $request): void
     {
-        /** @var Article $article */
-        $article = Article::find($id);
-        $article->status_id = !$request['checked'] ? 2 : 1;
+        /** @var Poster $poster */
+        $poster = Poster::find($id);
+        $poster->status_id = !$request['checked'] ? 2 : 1;
         /** @var User $user */
-        $user = $article->user;
+        $user = $poster->user;
 
-        $article->update();
+        $poster->update();
 
-        $user->notify(new PublishEntityNotification(self::ENTITY_NAME, $article->title));
-        event(new Notifications($article->user()->first()->id));
+        $user->notify(new PublishEntityNotification(self::ENTITY_NAME, $poster->title));
+        event(new Notifications($poster->user()->first()->id));
     }
 
     /**
@@ -101,8 +84,8 @@ class AdminArticleController extends Controller
      */
     public function delete(int $id): JsonResponse
     {
-        /** @var Article $article */
-        $article = Article::with([
+        /** @var Poster $poster */
+        $poster = Poster::with([
             'images',
             'user'
         ])
@@ -112,8 +95,8 @@ class AdminArticleController extends Controller
         DB::beginTransaction();
 
         try {
-            if (isset($article) && $article->images instanceof Collection) {
-                foreach ($article->images as $image) {
+            if (isset($poster) && $poster->images instanceof Collection) {
+                foreach ($poster->images as $image) {
                     $image = Image::find($image['id']);
 
                     if ($image['is_local'] === 1) {
@@ -123,10 +106,10 @@ class AdminArticleController extends Controller
                     Image::destroy(['id' => $image['id']]);
                 }
 
-                $article->user()->first()?->notify(new DeleteEntityNotification(self::ENTITY_NAME, $article->title));
-                event(new Notifications($article->user()->first()->id));
+                $poster->user()->first()?->notify(new DeleteEntityNotification(self::ENTITY_NAME, $poster->title));
+                event(new Notifications($poster->user()->first()->id));
 
-                Article::destroy($id);
+                Poster::destroy($id);
                 DB::commit();
 
 

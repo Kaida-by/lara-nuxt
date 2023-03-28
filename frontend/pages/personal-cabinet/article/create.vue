@@ -15,7 +15,9 @@
 <!--          </div>-->
 <!--        </draggable>-->
 <!--      </div>-->
-
+      <div class="invalid-feedback" v-if="errors.title">
+        {{ errors.title[0] }}
+      </div>
       <label>Description: </label>
 
       <vue-editor
@@ -39,9 +41,9 @@
 
 <!--      <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
 
-<!--      <div class="invalid-feedback" v-if="errors.text">-->
-<!--        {{ errors.text[0] }}-->
-<!--      </div>-->
+      <div class="invalid-feedback" v-if="errors.description">
+        {{ errors.description[0] }}
+      </div>
       <input type="submit" value="Create">
     </form>
 
@@ -81,7 +83,7 @@ export default {
         file: undefined,
         src: undefined
       },
-      cte_id: ''
+      cte_id: '',
     }
   },
   methods: {
@@ -107,7 +109,11 @@ export default {
       //   });
       // }
       // await this.$axios.post('/article/store', form, {})
-      await this.$axios.post('/article/' + this.cte_id, this.form, {})
+      try {
+        await this.$axios.post('/article/' + this.cte_id, this.form, {})
+      } catch (e) {
+        console.log(this.errors)
+      }
     },
     async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
       let formDataI = new FormData();

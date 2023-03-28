@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Models;
 
@@ -11,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Laravel\Scout\Searchable;
 
-class Article extends Model
+class Article extends Model implements EntityInterface
 {
     use HasFactory, Searchable;
 

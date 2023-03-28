@@ -2,41 +2,42 @@
 /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\PersonalCabinet;
 
 use App\Events\Notifications;
-use App\Http\Requests\ArticleRequest;
-use App\Http\Resources\ArticleResource;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PosterRequest;
+use App\Http\Resources\PosterResource;
 use App\Http\Services\EntityHelper;
 use App\Http\Services\UploadImagesService;
-use App\Models\Article;
+use App\Models\Poster;
 use App\Models\User;
 use App\Notifications\CreateEntityNotification;
 use App\Notifications\UpdateEntityNotification;
-use Illuminate\Support\Facades\Auth;
-use RuntimeException;
-use Throwable;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
+use RuntimeException;
+use Throwable;
 use function response;
 
-class PersonalCabinetController extends Controller
+class PosterPersonalCabinetController extends Controller
 {
-    public const ENTITY_TYPE = 2;
-    public const CATEGORY = 2;
-    public const ENTITY_NAME = 'article';
+    public const ENTITY_TYPE = 9;
+    public const ENTITY_NAME = 'poster';
 
-    protected Article $article;
+    protected Poster $poster;
 
-    public function __construct(Article $article)
+    public function __construct(Poster $poster)
     {
-        $this->article = $article;
+        $this->poster = $poster;
     }
 
-    public function getMyArticles(): AnonymousResourceCollection
+    public function getMyPosters(): AnonymousResourceCollection
     {
-        $articles = Article::with([
+        $posters = Poster::with([
             'images' => function($q) {
                 $q->where('entity_type_id', self::ENTITY_TYPE);
             }
@@ -45,26 +46,27 @@ class PersonalCabinetController extends Controller
             ->where(['author_id' => $this->user()->profile->id])
             ->simplePaginate(10);
 
-        return ArticleResource::collection($articles);
+        return PosterResource::collection($posters);
     }
 
     /**
      * @throws Throwable
      */
-    public function store(ArticleRequest $request): JsonResponse
+    public function store(PosterRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
-        $this->article->title = $validatedData['title'];
-        $this->article->description = $validatedData['description'];
-        $this->article->author_id = $this->user()->profile->id;
-        $this->article->entity_type_id = self::ENTITY_TYPE;
-        $this->article->category_id = self::CATEGORY;
-        $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
+        $this->poster->title = $validatedData['title'];
+        $this->poster->description = $validatedData['description'];
+        $timestamp = strtotime($request->date);
+        $this->poster->date = date('d/m/Y H:i:s', $timestamp);
+        $this->poster->author_id = $this->user()->profile->id;
+        $this->poster->entity_type_id = self::ENTITY_TYPE;
+        $this->poster->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
 
         try {
-            $this->article->save();
-            $currentId = Article::latest()->first()->id ?? 0;
+            $this->poster->save();
+            $currentId = Poster::latest()->first()->id ?? 0;
 
             if ($request->files->get('files')) {
                 try {
@@ -74,7 +76,7 @@ class PersonalCabinetController extends Controller
                         $request->files->get('files')
                     );
                 } catch (RuntimeException|Exception $exception) {
-                    Article::destroy($currentId);
+                    Poster::destroy($currentId);
 
                     return response()->json([
                         'success' => false,
@@ -89,12 +91,12 @@ class PersonalCabinetController extends Controller
 
             /** @var User $user */
             $user = Auth::user();
-            $user->notify(new CreateEntityNotification(self::ENTITY_NAME, $this->article->title));
+            $user->notify(new CreateEntityNotification(self::ENTITY_NAME, $this->poster->title));
             event(new Notifications($user->id));
 
             return response()->json([
                 'success' => true,
-                'article' => $this->article
+                'poster' => $this->poster
             ]);
         } catch (Exception $exception) {
             return response()->json([
@@ -114,7 +116,7 @@ class PersonalCabinetController extends Controller
      */
     public function edit(int $id): JsonResponse
     {
-        $article = Article::with([
+        $poster = Poster::with([
             'user' => function($q) {
                 $q->with(['profile']);
             },
@@ -126,74 +128,53 @@ class PersonalCabinetController extends Controller
             ->where(['id' => $id])
             ->get();
 
-        if (count($article) > 0) {
+        if (count($poster) > 0) {
             return response()->json([
                 'success' => true,
-                'data' => $article
+                'data' => $poster
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'data' => $article
+            'data' => $poster
         ], 404);
     }
 
     /**
      * @throws Throwable
      */
-    public function update(ArticleRequest $request, Article $article): JsonResponse
+    public function update(PosterRequest $request, Poster $poster): JsonResponse
     {
         $tags = EntityHelper::getTagsFromDescription($request->description);
         $usedImagesUuid = UploadImagesService::getUsedImagesUuidFromHTMLTags($tags);
-        UploadImagesService::removeUnusedImages($article, $usedImagesUuid);
+        UploadImagesService::removeUnusedImages($poster, $usedImagesUuid);
+        $timestamp = strtotime($request->date);
+        $dateTime = new \Illuminate\Support\Carbon($timestamp);
 
         try {
-            $article->update([
+            $poster->update([
                 'title' => $request->title,
                 'description' => $request->description,
+                'date' => $dateTime,
+//                'price' => $request->price,
                 'author_id' => $this->user()->profile->id,
                 'entity_type_id' => self::ENTITY_TYPE,
-                'category_id' => self::CATEGORY,
                 'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,
             ]);
 
             UploadImagesService::upload(
                 $request->files->get('file'),
                 self::ENTITY_TYPE,
-                $article->id,
+                $poster->id,
                 1,
                 true,
                 true
             );
 
-//            $oldImages = $request->images;
-//            $images = [];
-//
-//            if ($oldImages) {
-//                foreach ($oldImages as $key => $image) {
-//                    if (is_string($image)) {
-//                        $oldImage = json_decode($image, false, 512, JSON_THROW_ON_ERROR);
-//                        $images[$key] = $oldImage;
-//                    } else {
-//                        $images[$key] = $image;
-//                    }
-//                }
-//            }
-
-//            UploadImagesService::deleteMissingImages($article, $images);
-//
-//            if ($images) {
-//                UploadImagesService::save(
-//                    self::ENTITY_TYPE,
-//                    $article->id,
-//                    $images
-//                );
-//            }
-
             /** @var User $user */
             $user = Auth::user();
-            $user->notify(new UpdateEntityNotification(self::ENTITY_NAME, $article->title));
+            $user->notify(new UpdateEntityNotification(self::ENTITY_NAME, $poster->title));
             event(new Notifications($user->id));
 
             return response()->json([
@@ -213,21 +194,23 @@ class PersonalCabinetController extends Controller
         }
     }
 
-    public function createTemporaryArticle()
+    /**
+     * @return JsonResponse
+     */
+    public function createTemporaryPoster(): JsonResponse
     {
-        $this->article->title = '';
-        $this->article->description = '';
-        $this->article->author_id = $this->user()->profile->id;
-        $this->article->entity_type_id = self::ENTITY_TYPE;
-        $this->article->category_id = self::CATEGORY;
-        $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
+        $this->poster->title = '';
+        $this->poster->description = '';
+        $this->poster->author_id = $this->user()->profile->id;
+        $this->poster->entity_type_id = self::ENTITY_TYPE;
+        $this->poster->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
 
         try {
-            $this->article->save();
+            $this->poster->save();
 
             return response()->json([
                 'success' => true,
-                'data' => $this->article->id
+                'data' => $this->poster->id
             ]);
         } catch (Exception $exception) {
             return response()->json([

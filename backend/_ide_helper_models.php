@@ -333,10 +333,14 @@ namespace App\Models{
  * @property string $description
  * @property string $date
  * @property string $price
+ * @property int $author_id
  * @property int $entity_type_id
  * @property int $status_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Image[] $images
+ * @property-read int|null $images_count
+ * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|Poster newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Poster newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Poster query()

@@ -17,5 +17,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/articles', [ArticleController::class, 'showAll'])->name('.articles.index1');

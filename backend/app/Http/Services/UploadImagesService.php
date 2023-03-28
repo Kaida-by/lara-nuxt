@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Http\Controllers\CloudController;
+use App\Http\Interfaces\EntityInterface;
 use App\Models\Article;
 use App\Models\Image;
 use Exception;
@@ -51,6 +52,11 @@ class UploadImagesService
         $permittedMimeTypes = ['image/jpeg', 'image/png'];
 
         if ($uploadedFile instanceof UploadedFile) {
+
+            if ($uploadedFile->getError()) {
+                throw new RuntimeException('Failed to read file');
+            }
+
             if ($uploadedFile->getSize() > 10000000) {
                 throw new RuntimeException('Max file size 10 Mb');
             }
@@ -181,9 +187,9 @@ class UploadImagesService
      * @param array $usedImages
      * @return void
      */
-    public static function removeUnusedImages(Article $article, array $usedImages): void
+    public static function removeUnusedImages(EntityInterface $entity, array $usedImages): void
     {
-        $allUserImages = $article->images;
+        $allUserImages = $entity->images;
 
         /** @var Image $userImage */
         foreach ($allUserImages as $userImage) {
