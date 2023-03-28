@@ -7,7 +7,7 @@
     <nuxt-link to="/admin/articles" class="entity">Organizations</nuxt-link>
     <nuxt-link to="/admin/users" class="entity">Photo facts</nuxt-link>
     <nuxt-link to="/admin/articles" class="entity">Photo Galleries</nuxt-link>
-    <nuxt-link to="/admin/users" class="entity">Posters</nuxt-link>
+    <nuxt-link to="/admin/posters" class="entity">Posters</nuxt-link>
     <nuxt-link to="/admin/articles" class="entity">Vacancies</nuxt-link>
   </div>
 </template>

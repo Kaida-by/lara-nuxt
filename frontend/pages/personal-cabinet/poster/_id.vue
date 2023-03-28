@@ -1,0 +1,127 @@
+<template>
+  <div class="container">
+    <div class="poster">
+      <form @submit.prevent="update">
+
+        <label>Title: </label>
+        <input v-model="form.title" type="text" name="title" :class="{ 'is-invalid': errors.text }" placeholder="title">
+        <div class="invalid-feedback" v-if="errors.title">{{ errors.title[0] }}</div>
+
+        <label>Description: </label>
+        <vue-editor
+          id="editor"
+          useCustomImageHandler
+          @image-added="handleImageAdded"
+          v-model="form.description"
+        >
+        </vue-editor>
+
+        <VueCtkDateTimePicker v-model="form.date" />
+
+        <input type="submit" value="Update">
+      </form>
+    </div>
+    <div v-if="error" class="err_r">
+      {{ error }}
+    </div>
+  </div>
+</template>
+
+<script>
+
+import VueEditorComponent from '~/components/VueEditor'
+
+export default {
+  components: {
+    VueEditorComponent
+  },
+  data() {
+    return {
+      form: {
+        title: '',
+        description: '',
+        date: '',
+        mainImageUrl: [],
+      },
+      newFile: {},
+      file: '',
+      error: this.$route.query.error,
+    }
+  },
+  methods: {
+    async fetchData() {
+      await this.$axios.get('/poster/edit/' + this.$route.params.id)
+        .then((res) => {
+          const poster = res.data.data[0]
+
+          for (let key in this.form) {
+            this.form[key] = poster[key]
+          }
+        })
+        .catch(err => console.log(err))
+    },
+    async update() {
+      try {
+        await this.$axios.post('/poster/' + this.$route.params.id, this.form, {})
+      } catch(e) {
+        return;
+      }
+    },
+    async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
+      let formDataI = new FormData();
+
+      formDataI.append('file', file);
+      formDataI.append('entity_id', this.$route.params.id);
+      await this.$axios.post('/upload-image', formDataI)
+        .then(result => {
+          const url = result.data[0].src; // Get url from response
+          Editor.insertEmbed(cursorLocation, 'image', process.env.API_URL_PUBLIC + url);
+          resetUploader();
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+  },
+  mounted () {
+    this.fetchData()
+  }
+}
+</script>
+
+<style scoped>
+  .preview {
+    display: flex;
+  }
+  .preview > div {
+    display: flex;
+  }
+  .img {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .image_i {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+  .img span {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: white;
+    font-family: sans-serif;
+    padding: 0 0 0 2px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+</style>

@@ -1,19 +1,19 @@
 <?php /** @noinspection PhpMultipleClassDeclarationsInspection */
 
-namespace App\Http\Controllers\admin\article;
+namespace App\Http\Controllers\Admin\Posters;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ArticleResource;
-use App\Models\Article;
+use App\Http\Resources\PosterResource;
+use App\Models\Poster;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class ArticleSearchController extends Controller
+class PosterSearchController extends Controller
 {
     public function search(Request $request): AnonymousResourceCollection
     {
-        $articles = Article::search($request->get('query'))->get();
+        $articles = Poster::search($request->get('query'))->get();
 
-        return ArticleResource::collection($articles);
+        return PosterResource::collection($articles);
     }
 }

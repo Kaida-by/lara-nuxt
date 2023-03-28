@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Http\Controllers;
 
@@ -9,7 +11,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ArticleController extends Controller
 {
-    public function __construct(public Article $article, private ArticleRepository $articleRepository)
+    public function __construct(public Article $article, private readonly ArticleRepository $articleRepository)
     {
     }
 

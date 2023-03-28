@@ -29,9 +29,13 @@ class EntityHelper
      */
     public static function getUrlMainImageFromDescription(string $description): string|static
     {
-        $tags = self::getTagsFromDescription($description);
+        if ($description) {
+            $tags = self::getTagsFromDescription($description);
 
-        return self::getMainImageFromTags($tags);
+            return self::getMainImageFromTags($tags);
+        }
+
+        return '';
     }
 
     /**
@@ -78,7 +82,7 @@ class EntityHelper
 
     /**
      * @param array $tags
-     * @return static
+     * @return string
      */
     public static function getMainImageFromTags(array $tags): string
     {

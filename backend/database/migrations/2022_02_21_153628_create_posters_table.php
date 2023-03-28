@@ -15,10 +15,11 @@ class CreatePostersTable extends Migration
     {
         Schema::create('posters', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('description');
-            $table->dateTime('date');
-            $table->dateTime('price');
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->dateTime('date')->nullable();
+            $table->float('price')->nullable();
+            $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('entity_type_id');
             $table->unsignedBigInteger('status_id');
 

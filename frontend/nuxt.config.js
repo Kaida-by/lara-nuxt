@@ -37,7 +37,8 @@ export default {
     './plugins/axios',
     './plugins/vuedraggable.js',
     './plugins/element-ui.js',
-    './plugins/echo.js'
+    './plugins/echo.js',
+    { src: '~/plugins/vue-datetime-picker', ssr: false },
   ],
 
   env: {

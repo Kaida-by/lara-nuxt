@@ -6,12 +6,16 @@
           {{ $auth.user.name }}
         </div>
         <div>
+          <div>Article:</div>
           <div class="create-article">
             <nuxt-link to="personal-cabinet/article/create">Create</nuxt-link>
-            <nuxt-link to="personal-cabinet/article/">My Articles</nuxt-link>
+            <nuxt-link to="personal-cabinet/article/">Show all</nuxt-link>
           </div>
-          <div class="show-articles">
 
+          <div>Posters:</div>
+          <div class="create-poster">
+            <nuxt-link to="personal-cabinet/posters/create">Create</nuxt-link>
+            <nuxt-link to="personal-cabinet/posters/">Show all</nuxt-link>
           </div>
         </div>
       </div>
