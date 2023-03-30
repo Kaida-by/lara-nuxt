@@ -60,6 +60,7 @@ class PosterPersonalCabinetController extends Controller
         $this->poster->description = $validatedData['description'];
         $timestamp = strtotime($request->date);
         $this->poster->date = date('d/m/Y H:i:s', $timestamp);
+        $this->poster->price = $validatedData['price'];
         $this->poster->author_id = $this->user()->profile->id;
         $this->poster->entity_type_id = self::ENTITY_TYPE;
         $this->poster->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
@@ -157,7 +158,7 @@ class PosterPersonalCabinetController extends Controller
                 'title' => $request->title,
                 'description' => $request->description,
                 'date' => $dateTime,
-//                'price' => $request->price,
+                'price' => $request->price,
                 'author_id' => $this->user()->profile->id,
                 'entity_type_id' => self::ENTITY_TYPE,
                 'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,

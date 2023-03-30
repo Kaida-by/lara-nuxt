@@ -13,11 +13,14 @@
           </div>
           <div class="med_art_text" v-html="poster.description"></div>
 
-          <div class="bot_art_images">
-            <div class="bot_art_image_in" v-for="image in poster.images">
-              <el-image :src=image.src alt="img" :preview-src-list="[image.src]" fit=cover>
-              </el-image>
-            </div>
+          <div>
+            <span>When?</span>
+            <p>{{ poster.date }}</p>
+          </div>
+
+          <div>
+            <span>How much is it?</span>
+            <p>{{ poster.price }}</p>
           </div>
         </div>
 

@@ -26,6 +26,8 @@ class PosterRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:65000',
+            'date' => 'required',
+            'price' => 'required|numeric|between:0,1000000.99',
         ];
     }
 
@@ -38,6 +40,10 @@ class PosterRequest extends FormRequest
             'description.required' => 'Поле "описание" обязательно',
             'description.string' => 'Поле "описание" должно быть строкой',
             'description.max' => 'Поле "описание" должно быть не более 65000 символов',
+            'date.required' => 'Поле "дата" обязательно',
+            'price.required' => 'Поле "цена" обязательно',
+            'price.numeric' => 'Поле "цена" должно быть числом',
+            'price.between' => 'Поле "цена" должно быть между значениями 0 и 1000000',
         ];
     }
 }
