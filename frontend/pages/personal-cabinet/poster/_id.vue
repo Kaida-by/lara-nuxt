@@ -16,7 +16,13 @@
         >
         </vue-editor>
 
+        <div>When?</div>
         <VueCtkDateTimePicker v-model="form.date" />
+
+        <div>
+          <div>How much is it?</div>
+          <input type="number" step="0.01" v-model="form.price">
+        </div>
 
         <input type="submit" value="Update">
       </form>
@@ -41,6 +47,7 @@ export default {
         title: '',
         description: '',
         date: '',
+        price: '',
         mainImageUrl: [],
       },
       newFile: {},

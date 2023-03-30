@@ -17,11 +17,26 @@
       >
       </vue-editor>
 
-      <VueCtkDateTimePicker v-model="form.date" />
-
       <div class="invalid-feedback" v-if="errors.description">
         {{ errors.description[0] }}
       </div>
+
+      <div>When?</div>
+      <VueCtkDateTimePicker v-model="form.date" />
+
+      <div class="invalid-feedback" v-if="errors.date">
+        {{ errors.date[0] }}
+      </div>
+
+      <div>
+        <div>How much is it?</div>
+        <input type="number" step="0.01" v-model="form.price">
+      </div>
+
+      <div class="invalid-feedback" v-if="errors.price">
+        {{ errors.price[0] }}
+      </div>
+
       <input type="submit" value="Create">
     </form>
 

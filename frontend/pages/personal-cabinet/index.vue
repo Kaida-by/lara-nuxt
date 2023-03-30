@@ -8,14 +8,14 @@
         <div>
           <div>Article:</div>
           <div class="create-article">
-            <nuxt-link to="personal-cabinet/article/create">Create</nuxt-link>
-            <nuxt-link to="personal-cabinet/article/">Show all</nuxt-link>
+            <nuxt-link to="/personal-cabinet/article/create">Create</nuxt-link>
+            <nuxt-link to="/personal-cabinet/article/">Show all</nuxt-link>
           </div>
 
           <div>Posters:</div>
           <div class="create-poster">
-            <nuxt-link to="personal-cabinet/posters/create">Create</nuxt-link>
-            <nuxt-link to="personal-cabinet/posters/">Show all</nuxt-link>
+            <nuxt-link to="/personal-cabinet/poster/create">Create</nuxt-link>
+            <nuxt-link to="/personal-cabinet/poster/">Show all</nuxt-link>
           </div>
         </div>
       </div>
