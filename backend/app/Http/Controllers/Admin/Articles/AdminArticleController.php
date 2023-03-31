@@ -45,12 +45,8 @@ class AdminArticleController extends Controller
      */
     public function getCategories(): JsonResponse
     {
-        $categories = DB::table('categories', 'cat')
-            ->select(['cat.id', 'cat.title', 'cat.slug', DB::raw('count(category_id) as cat')])
-            ->leftJoin('article_category', 'cat.id', '=', 'category_id')
-            ->where('category_type_id', self::CATEGORY)
-            ->groupBy(['category_id', 'cat.id', 'cat.title'])
-            ->get();
+        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categories = EntityHelper::getCategories($categoryId, 'article_category');
 
         return response()->json([
             'success' => true,

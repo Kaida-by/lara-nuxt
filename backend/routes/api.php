@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Auth
 Route::group(['prefix' => '/auth'], static function () {
     Route::post('register', [RegisterController::class, 'register']);
     Route::post('login', [LoginController::class, 'login']);
@@ -69,6 +70,7 @@ Route::group(['middleware' => 'jwt.auth'], static function () {
         Route::get('/article/edit/{id}' ,[ArticlePersonalCabinetController::class, 'edit'])->name('article.edit');
         Route::post('/article/store', [ArticlePersonalCabinetController::class, 'store'])->name('article.store');
         Route::post('/article/{article}', [ArticlePersonalCabinetController::class, 'update'])->name('article.update');
+        Route::get('/get-article-categories', [ArticlePersonalCabinetController::class, 'getCategories'])->name('article.get-categories');
             //Create temporary Entity
             Route::post('/article-cte', [ArticlePersonalCabinetController::class, 'createTemporaryArticle'])->name('article.cte');
             Route::get('/get-last-article-cte', [ArticlePersonalCabinetController::class, 'getLastArticle'])->name('last.article.cte');
@@ -78,22 +80,22 @@ Route::group(['middleware' => 'jwt.auth'], static function () {
         Route::get('/poster/edit/{id}' ,[PosterPersonalCabinetController::class, 'edit'])->name('poster.edit');
         Route::post('/poster/store', [PosterPersonalCabinetController::class, 'store'])->name('poster.store');
         Route::post('/poster/{poster}', [PosterPersonalCabinetController::class, 'update'])->name('poster.update');
+        Route::get('/get-poster-categories', [PosterPersonalCabinetController::class, 'getCategories'])->name('poster.get-categories');
             //Create temporary Entity
             Route::post('/poster-cte', [PosterPersonalCabinetController::class, 'createTemporaryPoster'])->name('poster.cte');
 
 });
 
+// Admin
 Route::group(['prefix' => '/admin'], static function () {
     Route::post('login', [LoginAdminController::class, 'login']);
-
-    // Admin
 
         // Article
         Route::get('/articles', [AdminArticleController::class, 'showAll'])->name('admin.articles.index');
         Route::get('/article/edit/{id}' ,[AdminArticleController::class, 'edit'])->name('admin.article.edit');
         Route::patch('/article/approve/{id}' ,[AdminArticleController::class, 'approve'])->name('admin.article.approve');
         Route::delete('/article/delete/{id}' ,[AdminArticleController::class, 'delete'])->name('admin.article.delete');
-        Route::get('/article-categories', [AdminArticleController::class, 'getCategories'])->name('article-categories.index');
+        Route::get('/article-categories', [AdminArticleController::class, 'getCategories'])->name('admin.article-categories.index');
             // Search
             Route::get('/article/search', [ArticleSearchController::class, 'search']);
 
@@ -102,6 +104,7 @@ Route::group(['prefix' => '/admin'], static function () {
         Route::get('/poster/edit/{id}' ,[AdminPosterController::class, 'edit'])->name('admin.poster.edit');
         Route::patch('/poster/approve/{id}' ,[AdminPosterController::class, 'approve'])->name('admin.poster.approve');
         Route::delete('/poster/delete/{id}' ,[AdminPosterController::class, 'delete'])->name('admin.poster.delete');
+        Route::get('/poster-categories', [AdminPosterController::class, 'getCategories'])->name('admin.poster-categories.index');
             // Search
             Route::get('/poster/search', [PosterSearchController::class, 'search']);
 });

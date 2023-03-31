@@ -121,7 +121,7 @@ export default {
       this.fetchData()
     },
     async fetchDataCategories() {
-      await this.$axios.get('/admin/article-categories')
+      await this.$axios.get('/admin/article-categories?categoryId=' + 2)
         .then((res) => {
           this.categories = res.data.categories
         })

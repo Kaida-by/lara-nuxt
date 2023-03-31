@@ -121,7 +121,8 @@ class ArticlePersonalCabinetController extends Controller
             'entityStatus',
             'images' => function($q) {
                 $q->orderBy('order');
-            }
+            },
+            'categories'
         ])
             ->where(['id' => $id])
             ->get();
@@ -148,6 +149,9 @@ class ArticlePersonalCabinetController extends Controller
         $usedImagesUuid = UploadImagesService::getUsedImagesUuidFromHTMLTags($tags);
         UploadImagesService::removeUnusedImages($article, $usedImagesUuid);
 
+        $categories = $request->get('categories');
+        $categoryIds = EntityHelper::getCategoriesIdFromCategoryArray($categories);
+
         try {
             $article->update([
                 'title' => $request->title,
@@ -158,6 +162,8 @@ class ArticlePersonalCabinetController extends Controller
                 'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,
             ]);
 
+            $article->categories()->sync($categoryIds);
+
             UploadImagesService::upload(
                 $request->files->get('file'),
                 self::ENTITY_TYPE,
@@ -165,30 +171,6 @@ class ArticlePersonalCabinetController extends Controller
                 1,
                 true,
             );
-
-//            $oldImages = $request->images;
-//            $images = [];
-//
-//            if ($oldImages) {
-//                foreach ($oldImages as $key => $image) {
-//                    if (is_string($image)) {
-//                        $oldImage = json_decode($image, false, 512, JSON_THROW_ON_ERROR);
-//                        $images[$key] = $oldImage;
-//                    } else {
-//                        $images[$key] = $image;
-//                    }
-//                }
-//            }
-
-//            UploadImagesService::deleteMissingImages($article, $images);
-//
-//            if ($images) {
-//                UploadImagesService::save(
-//                    self::ENTITY_TYPE,
-//                    $article->id,
-//                    $images
-//                );
-//            }
 
             /** @var User $user */
             $user = $this->user();
@@ -237,5 +219,19 @@ class ArticlePersonalCabinetController extends Controller
                 'message' => $exception->getMessage()
             ]);
         }
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getCategories(): JsonResponse
+    {
+        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categories = EntityHelper::getCategories($categoryId, 'article_category');
+
+        return response()->json([
+            'success' => true,
+            'categories' => $categories
+        ]);
     }
 }

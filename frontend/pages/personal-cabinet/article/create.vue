@@ -5,16 +5,6 @@
       <label>Name: </label>
       <input v-model="form.title" type="text" name="name" :class="{ 'is-invalid': errors.title }" placeholder="title">
 
-<!--      <div><input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)"></div>-->
-
-<!--      <div class="preview">-->
-<!--        <draggable v-model="form.mainFile" :animation="300" @start="drag=true" @end="drag=false">-->
-<!--          <div class="img" v-for="(image, key) in form.mainFile">-->
-<!--            <img class="image_i" :src="image.src" alt="">-->
-<!--            <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
-<!--          </div>-->
-<!--        </draggable>-->
-<!--      </div>-->
       <div class="invalid-feedback" v-if="errors.title">
         {{ errors.title[0] }}
       </div>
@@ -28,22 +18,19 @@
       >
       </vue-editor>
 
-<!--      <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>-->
-
-<!--      <div class="preview">-->
-<!--        <draggable v-model="files" :animation="300" @start="drag=true" @end="drag=false">-->
-<!--          <div class="img" v-for="(image, key) in files">-->
-<!--            <img class="image_i" :src="image.src" alt="">-->
-<!--            <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
-<!--          </div>-->
-<!--        </draggable>-->
-<!--      </div>-->
-
-<!--      <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
-
       <div class="invalid-feedback" v-if="errors.description">
         {{ errors.description[0] }}
       </div>
+
+      <div>
+        <div>Можно выбрать несколько категорий, путём зажатия клавиши "ctrl" и клика левой кнопки мышки</div>
+        <select multiple v-model="form.categories">
+          <option v-for="category in categories" :value="category.title">{{ category.title }}</option>
+        </select>
+        <div>Вы выбрали категории:</div>
+          <span v-for="category in form.categories">{{ category }}</span>
+      </div>
+
       <input type="submit" value="Create">
     </form>
 
@@ -70,6 +57,7 @@ export default {
         title: '',
         description: '',
         author_id: this.$auth.user.id,
+        categories: [],
         // mainFile: [],
       },
       file: '',
@@ -84,6 +72,7 @@ export default {
         src: undefined
       },
       cte_id: '',
+      categories: [],
     }
   },
   methods: {
@@ -156,10 +145,17 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    }
+    },
+    async getCategories() {
+      await this.$axios.get('/get-article-categories?categoryId=' + 2)
+        .then(result => {
+          this.categories = result.data.categories
+        })
+    },
   },
   mounted() {
     this.createTemporaryArticle()
+    this.getCategories()
   }
 }
 </script>
