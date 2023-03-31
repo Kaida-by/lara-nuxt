@@ -37,7 +37,7 @@ class Article extends Model implements EntityInterface
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class, 'article_category')->withTimestamps();
     }
 
     public function user(): HasOneThrough

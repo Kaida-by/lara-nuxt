@@ -24,6 +24,21 @@
           <input type="number" step="0.01" v-model="form.price">
         </div>
 
+        <div v-if="!isShow">
+          <div>Вы выбрали категории:</div>
+          <span v-for="category in form.categories">{{ category.title }}</span>
+        </div>
+        <div @click="isShow = !isShow">Изменить?</div>
+
+        <div v-if="isShow">
+          <div>Можно выбрать несколько категорий, путём зажатия клавиши "ctrl" и клика левой кнопки мышки</div>
+          <select multiple v-model="form.categories">
+            <option v-for="category in categories" :value="category.title">{{ category.title }}</option>
+          </select>
+          <div>Вы выбрали категории:</div>
+          <span v-for="category in form.categories" v-if="!category.title">{{ category }}</span>
+        </div>
+
         <input type="submit" value="Update">
       </form>
     </div>
@@ -48,11 +63,11 @@ export default {
         description: '',
         date: '',
         price: '',
-        mainImageUrl: [],
+        categories: [],
       },
-      newFile: {},
-      file: '',
       error: this.$route.query.error,
+      categories: [],
+      isShow: false,
     }
   },
   methods: {
@@ -89,9 +104,16 @@ export default {
           console.log(err);
         });
     },
+    async getCategories() {
+      await this.$axios.get('/get-article-categories?categoryId=' + 2)
+        .then(result => {
+          this.categories = result.data.categories
+        })
+    },
   },
   mounted () {
     this.fetchData()
+    this.getCategories()
   }
 }
 </script>

@@ -1,9 +1,15 @@
 <?php
 
+/** @noinspection PhpMultipleClassDeclarationsInspection */
+
 namespace App\Http\Services;
 
+use App\Models\Category;
 use DOMDocument;
 use DOMNode;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use RecursiveIteratorIterator;
 
 class EntityHelper
@@ -22,6 +28,9 @@ class EntityHelper
 
     public const ENTITY_STATUS_ACTIVE = 1;
     public const ENTITY_STATUS_UNDER_MODERATION = 2;
+
+    public const IS_ANNOUNCEMENT_CATEGORIES = 1;
+    public const IS_ARTICLE_CATEGORIES = 2;
 
     /**
      * @param string $description
@@ -96,5 +105,34 @@ class EntityHelper
         }
 
         return $path;
+    }
+
+    /**
+     * @param int $categoryId
+     * @return Collection
+     */
+    public static function getCategories(int $categoryId, string $relationTable): Collection
+    {
+        return DB::table('categories', 'cat')
+            ->select(['cat.id', 'cat.title', 'cat.slug', DB::raw('count(category_id) as cat')])
+            ->leftJoin($relationTable, 'cat.id', '=', 'category_id')
+            ->where('category_type_id', $categoryId)
+            ->groupBy(['category_id', 'cat.id', 'cat.title'])
+            ->get();
+    }
+
+    /**
+     * @param array $categories
+     * @return array
+     */
+    public static function getCategoriesIdFromCategoryArray(array $categories): array
+    {
+        $categoryIds = Category::whereIn('title', $categories)->get('id')->toArray();
+
+        return array_reduce($categoryIds, static function ($acc, $id) {
+            $acc[] = $id['id'];
+
+            return $acc;
+        }, []);
     }
 }

@@ -42,6 +42,21 @@ class AdminPosterController extends Controller
     }
 
     /**
+     * @return JsonResponse
+     */
+    public function getCategories(): JsonResponse
+    {
+        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categories = EntityHelper::getCategories($categoryId, 'poster_category');
+
+        return response()->json([
+            'success' => true,
+            'categories' => $categories
+        ]);
+    }
+
+
+    /**
      * @param int $id
      * @return JsonResponse
      */

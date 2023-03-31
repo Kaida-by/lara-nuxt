@@ -124,7 +124,8 @@ class PosterPersonalCabinetController extends Controller
             'entityStatus',
             'images' => function($q) {
                 $q->orderBy('order');
-            }
+            },
+            'categories'
         ])
             ->where(['id' => $id])
             ->get();
@@ -153,6 +154,9 @@ class PosterPersonalCabinetController extends Controller
         $timestamp = strtotime($request->date);
         $dateTime = new \Illuminate\Support\Carbon($timestamp);
 
+        $categories = $request->get('categories');
+        $categoryIds = EntityHelper::getCategoriesIdFromCategoryArray($categories);
+
         try {
             $poster->update([
                 'title' => $request->title,
@@ -163,6 +167,8 @@ class PosterPersonalCabinetController extends Controller
                 'entity_type_id' => self::ENTITY_TYPE,
                 'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,
             ]);
+
+            $poster->categories()->sync($categoryIds);
 
             UploadImagesService::upload(
                 $request->files->get('file'),
@@ -219,5 +225,20 @@ class PosterPersonalCabinetController extends Controller
                 'message' => $exception->getMessage()
             ]);
         }
+    }
+
+
+    /**
+     * @return JsonResponse
+     */
+    public function getCategories(): JsonResponse
+    {
+        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categories = EntityHelper::getCategories($categoryId, 'poster_category');
+
+        return response()->json([
+            'success' => true,
+            'categories' => $categories
+        ]);
     }
 }

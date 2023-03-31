@@ -37,6 +37,15 @@
         {{ errors.price[0] }}
       </div>
 
+      <div>
+        <div>Можно выбрать несколько категорий, путём зажатия клавиши "ctrl" и клика левой кнопки мышки</div>
+        <select multiple v-model="form.categories">
+          <option v-for="category in categories" :value="category.title">{{ category.title }}</option>
+        </select>
+        <div>Вы выбрали категории:</div>
+        <span v-for="category in form.categories">{{ category }}</span>
+      </div>
+
       <input type="submit" value="Create">
     </form>
 
@@ -64,6 +73,7 @@ export default {
         date: '',
         price: '',
         author_id: this.$auth.user.id,
+        categories: [],
       },
       file: '',
       showPreview: false,
@@ -77,6 +87,7 @@ export default {
         src: undefined
       },
       cte_id: '',
+      categories: [],
     }
   },
   methods: {
@@ -110,10 +121,17 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    }
+    },
+    async getCategories() {
+      await this.$axios.get('/get-poster-categories?categoryId=' + 2)
+        .then(result => {
+          this.categories = result.data.categories
+        })
+    },
   },
   mounted() {
     this.createTemporaryPoster()
+    this.getCategories()
   }
 }
 </script>

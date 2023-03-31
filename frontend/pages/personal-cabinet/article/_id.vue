@@ -8,8 +8,6 @@
         <div class="invalid-feedback" v-if="errors.title">{{ errors.title[0] }}</div>
 
         <label>Description: </label>
-<!--        <input v-model="form.description" type="text" name="description" :class="{ 'is-invalid': errors.description }" placeholder="description">-->
-<!--        <div class="invalid-feedback" v-if="errors.description">{{ errors.description[0] }}</div>-->
 
         <vue-editor
           id="editor"
@@ -17,22 +15,22 @@
           @image-added="handleImageAdded"
           v-model="form.description"
         >
-
         </vue-editor>
 
-<!--        <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>-->
+        <div v-if="!isShow">
+          <div>Вы выбрали категории:</div>
+          <span v-for="category in form.categories">{{ category.title }}</span>
+        </div>
+        <div @click="isShow = !isShow">Изменить?</div>
 
-<!--        <div class="images">-->
-<!--          <span>Images:</span>-->
-<!--          <div class="preview">-->
-<!--            <draggable v-model="form.mainImageUrl" :animation="300" @start="drag=true" @end="drag=false">-->
-<!--              <div class="img" v-for="(image, key) in form.mainImageUrl">-->
-<!--                <img class="image_i" :src="image.src" alt="">-->
-<!--                <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
-<!--              </div>-->
-<!--            </draggable>-->
-<!--          </div>-->
-<!--        </div>-->
+        <div v-if="isShow">
+          <div>Можно выбрать несколько категорий, путём зажатия клавиши "ctrl" и клика левой кнопки мышки</div>
+          <select multiple v-model="form.categories">
+            <option v-for="category in categories" :value="category.title">{{ category.title }}</option>
+          </select>
+          <div>Вы выбрали категории:</div>
+          <span v-for="category in form.categories" v-if="!category.title">{{ category }}</span>
+        </div>
 
         <input type="submit" value="Update">
       </form>
@@ -44,11 +42,10 @@
 </template>
 
 <script>
-import _ from "lodash";
+
 import VueEditorComponent from '~/components/VueEditor'
 
 export default {
-  // name: "article",
   components: {
     VueEditorComponent
   },
@@ -57,11 +54,11 @@ export default {
       form: {
         title: '',
         description: '',
-        mainImageUrl: [],
+        categories: [],
       },
-      newFile: {},
-      file: '',
       error: this.$route.query.error,
+      categories: [],
+      isShow: false,
     }
   },
   methods: {
@@ -78,49 +75,12 @@ export default {
     },
     async update() {
       try {
-        let form = new FormData();
-        // _.each(this.form, (value, key) => {
-        //   if (key === 'mainImageUrl') {
-        //     for (var i = 0; i < this.form.mainImageUrl.length; i++) {
-        //       let file = this.form.mainImageUrl[i].file;
-        //       if (file) {
-        //         form.append('mainImageUrl[' + i + ']', file)
-        //       } else {
-        //         form.append('mainImageUrl[' + i + ']', JSON.stringify(this.form.mainImageUrl[i]))
-        //       }
-        //     }
-        //   } else {
-        //     form.append(key, value)
-        //   }
-        // });
-
-        // _.each(this.form, (value, key) => {
-        //   form.append(key, value)
-        // });
-
-        // for (let value of form.values()) {
-        //   console.log(value);
-        // }
-
         await this.$axios.post('/article/' + this.$route.params.id, this.form, {})
       } catch(e) {
         return;
       }
     },
-    // handleImages(e) {
-    //   const files = e.target.files || e.dataTransfer.files
-    //   for(let i = 0; i < files.length; i++) {
-    //     let reader = new FileReader()
-    //     reader.onload = (e) => {
-    //       this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
-    //       this.form.mainImageUrl.push(this.newFile)
-    //     }
-    //     reader.readAsDataURL(files[i])
-    //   }
-    // },
-    // removeFile( key ) {
-    //   this.form.mainImageUrl.splice( key, 1 );
-    // },
+
     async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
       let formDataI = new FormData();
 
@@ -136,9 +96,16 @@ export default {
           console.log(err);
         });
     },
+    async getCategories() {
+      await this.$axios.get('/get-article-categories?categoryId=' + 2)
+        .then(result => {
+          this.categories = result.data.categories
+        })
+    },
   },
   mounted () {
     this.fetchData()
+    this.getCategories()
   }
 }
 </script>
