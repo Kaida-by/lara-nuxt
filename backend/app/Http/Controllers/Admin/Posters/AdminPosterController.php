@@ -4,41 +4,45 @@
 
 namespace App\Http\Controllers\Admin\Posters;
 
+use App\Data\ResourceData\PosterData;
+use App\Enums\EntityCategory;
+use App\Enums\EntityName;
+use App\Enums\EntityType;
 use App\Events\Notifications;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminEntityRequest;
-use App\Http\Resources\PosterResource;
 use App\Http\Services\EntityHelper;
 use App\Models\Image;
 use App\Models\Poster;
 use App\Models\User;
 use App\Notifications\DeleteEntityNotification;
 use App\Notifications\PublishEntityNotification;
+use App\Notifications\UpdateEntityNotification;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\PaginatedDataCollection;
 use Throwable;
 
 use function response;
 
 class AdminPosterController extends Controller
 {
-    public const ENTITY_NAME = 'poster';
-
-    public function showAll(): AnonymousResourceCollection
+    public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         $posters = Poster::with([
             'images' => function($q) {
-                $q->where('entity_type_id', EntityHelper::TYPE_POSTERS);
+                $q->where('entity_type_id', EntityType::Poster->value);
             },
             'entityStatus',
             'user'
         ])
             ->simplePaginate(10);
 
-        return PosterResource::collection($posters);
+        return PosterData::collection($posters);
     }
 
     /**
@@ -46,7 +50,7 @@ class AdminPosterController extends Controller
      */
     public function getCategories(): JsonResponse
     {
-        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categoryId = (int) request('categoryId') ?: EntityCategory::Article->value;
         $categories = EntityHelper::getCategories($categoryId, 'poster_category');
 
         return response()->json([
@@ -54,7 +58,6 @@ class AdminPosterController extends Controller
             'categories' => $categories
         ]);
     }
-
 
     /**
      * @param int $id
@@ -72,14 +75,19 @@ class AdminPosterController extends Controller
             }
         ])
             ->where(['id' => $id])
-            ->get();
+            ->firstOrFail();
 
         return response()->json([
             'success' => true,
-            'data' => $poster
+            'data' => PosterData::from($poster)
         ]);
     }
 
+    /**
+     * @param int $id
+     * @param AdminEntityRequest $request
+     * @return void
+     */
     public function approve(int $id, AdminEntityRequest $request): void
     {
         /** @var Poster $poster */
@@ -90,7 +98,12 @@ class AdminPosterController extends Controller
 
         $poster->update();
 
-        $user->notify(new PublishEntityNotification(self::ENTITY_NAME, $poster->title));
+        if ($poster->status_id === 1) {
+            $user->notify(new PublishEntityNotification(EntityName::Poster-> value, $poster->title));
+        } else {
+            $user->notify(new UpdateEntityNotification(EntityName::Poster-> value, $poster->title));
+        }
+
         event(new Notifications($poster->user()->first()->id));
     }
 
@@ -121,7 +134,7 @@ class AdminPosterController extends Controller
                     Image::destroy(['id' => $image['id']]);
                 }
 
-                $poster->user()->first()?->notify(new DeleteEntityNotification(self::ENTITY_NAME, $poster->title));
+                $poster->user()->first()?->notify(new DeleteEntityNotification(EntityName::Poster-> value, $poster->title));
                 event(new Notifications($poster->user()->first()->id));
 
                 Poster::destroy($id);

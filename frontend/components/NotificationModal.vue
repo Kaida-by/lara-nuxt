@@ -39,7 +39,7 @@ export default {
   display: flex;
   justify-content: center;
   background-color: #000000da;
-  z-index: 9;
+  z-index: 10;
 }
 .modal {
   text-align: left;

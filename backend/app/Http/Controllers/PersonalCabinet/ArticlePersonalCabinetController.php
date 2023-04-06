@@ -4,9 +4,13 @@
 
 namespace App\Http\Controllers\PersonalCabinet;
 
+use App\Data\RequestData\ArticleData;
+use App\Enums\EntityCategory;
+use App\Enums\EntityName;
+use App\Enums\EntityStatus;
+use App\Enums\EntityType;
 use App\Events\Notifications;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ArticleRequest;
 use App\Http\Resources\ArticleResource;
 use App\Http\Services\EntityHelper;
 use App\Http\Services\UploadImagesService;
@@ -23,10 +27,6 @@ use function response;
 
 class ArticlePersonalCabinetController extends Controller
 {
-    public const ENTITY_TYPE = 2;
-    public const CATEGORY = 2;
-    public const ENTITY_NAME = 'article';
-
     protected Article $article;
 
     public function __construct(Article $article)
@@ -38,10 +38,10 @@ class ArticlePersonalCabinetController extends Controller
     {
         $articles = Article::with([
             'images' => function($q) {
-                $q->where('entity_type_id', self::ENTITY_TYPE);
+                $q->where('entity_type_id', EntityType::Article->value);
             }
         ])
-            ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+            ->where(['status_id' => EntityStatus::Active->value])
             ->where(['author_id' => $this->user()->profile->id])
             ->simplePaginate(10);
 
@@ -51,27 +51,25 @@ class ArticlePersonalCabinetController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(ArticleRequest $request): JsonResponse
+    public function store(ArticleData $data): JsonResponse
     {
-        $validatedData = $request->validated();
-
-        $this->article->title = $validatedData['title'];
-        $this->article->description = $validatedData['description'];
+        $this->article->title = $data->title;
+        $this->article->description = $data->description;
         $this->article->author_id = $this->user()->profile->id;
-        $this->article->entity_type_id = self::ENTITY_TYPE;
-        $this->article->category_id = self::CATEGORY;
-        $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
+        $this->article->entity_type_id = EntityType::Article->value;
+        $this->article->category_id = EntityCategory::Article->value;
+        $this->article->status_id = EntityStatus::UnderModeration->value;
 
         try {
             $this->article->save();
             $currentId = Article::latest()->first()->id ?? 0;
 
-            if ($request->files->get('files')) {
+            if (request()->files->get('file')) {
                 try {
                     UploadImagesService::save(
-                        self::ENTITY_TYPE,
+                        EntityType::Article->value,
                         $currentId,
-                        $request->files->get('files')
+                        request()->files->get('file')
                     );
                 } catch (RuntimeException|Exception $exception) {
                     Article::destroy($currentId);
@@ -89,7 +87,7 @@ class ArticlePersonalCabinetController extends Controller
 
             /** @var User $user */
             $user = $this->user();
-            $user->notify(new CreateEntityNotification(self::ENTITY_NAME, $this->article->title));
+            $user->notify(new CreateEntityNotification(EntityName::Article->value, $this->article->title));
             event(new Notifications($user->id));
 
             return response()->json([
@@ -143,30 +141,30 @@ class ArticlePersonalCabinetController extends Controller
     /**
      * @throws Throwable
      */
-    public function update(ArticleRequest $request, Article $article): JsonResponse
+    public function update(ArticleData $data, Article $article): JsonResponse
     {
-        $tags = EntityHelper::getTagsFromDescription($request->description);
+        $tags = EntityHelper::getTagsFromDescription($data->description);
         $usedImagesUuid = UploadImagesService::getUsedImagesUuidFromHTMLTags($tags);
         UploadImagesService::removeUnusedImages($article, $usedImagesUuid);
 
-        $categories = $request->get('categories');
+        $categories = request('categories');
         $categoryIds = EntityHelper::getCategoriesIdFromCategoryArray($categories);
 
         try {
             $article->update([
-                'title' => $request->title,
-                'description' => $request->description,
+                'title' => $data->title,
+                'description' => $data->description,
                 'author_id' => $this->user()->profile->id,
-                'entity_type_id' => self::ENTITY_TYPE,
-                'category_id' => self::CATEGORY,
-                'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,
+                'entity_type_id' => EntityType::Article->value,
+                'category_id' => EntityType::Article->value,
+                'status_id' => EntityStatus::UnderModeration->value,
             ]);
 
             $article->categories()->sync($categoryIds);
 
             UploadImagesService::upload(
-                $request->files->get('file'),
-                self::ENTITY_TYPE,
+                request()->files->get('file'),
+                EntityType::Article->value,
                 $article->id,
                 1,
                 true,
@@ -174,12 +172,12 @@ class ArticlePersonalCabinetController extends Controller
 
             /** @var User $user */
             $user = $this->user();
-            $user->notify(new UpdateEntityNotification(self::ENTITY_NAME, $article->title));
+            $user->notify(new UpdateEntityNotification(EntityName::Article->value, $article->title));
             event(new Notifications($user->id));
 
             return response()->json([
                 'success' => true,
-                'data' => $request['images']
+                'data' => $data
             ]);
         } catch (Exception $exception) {
             return response()->json([
@@ -202,9 +200,9 @@ class ArticlePersonalCabinetController extends Controller
         $this->article->title = '';
         $this->article->description = '';
         $this->article->author_id = $this->user()->profile->id;
-        $this->article->entity_type_id = self::ENTITY_TYPE;
-        $this->article->category_id = self::CATEGORY;
-        $this->article->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
+        $this->article->entity_type_id = EntityType::Article->value;
+        $this->article->category_id = EntityType::Article->value;
+        $this->article->status_id = EntityStatus::UnderModeration->value;
 
         try {
             $this->article->save();
@@ -226,7 +224,7 @@ class ArticlePersonalCabinetController extends Controller
      */
     public function getCategories(): JsonResponse
     {
-        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categoryId = (int) request('categoryId') ?: EntityCategory::Article->value;
         $categories = EntityHelper::getCategories($categoryId, 'article_category');
 
         return response()->json([

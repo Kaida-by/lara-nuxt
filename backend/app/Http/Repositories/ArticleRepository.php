@@ -4,40 +4,43 @@
 
 namespace App\Http\Repositories;
 
+use App\Data\ResourceData\ArticleData;
+use App\Enums\EntityStatus;
+use App\Enums\EntityType;
 use App\Http\Interfaces\ArticleRepositoryInterface;
-use App\Http\Resources\ArticleResource;
-use App\Http\Services\EntityHelper;
 use App\Models\Article;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\PaginatedDataCollection;
 use function response;
 
 class ArticleRepository implements ArticleRepositoryInterface
 {
-    public function showAll(): AnonymousResourceCollection
+    public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         $count = (int) request('count');
         if ($count && $count <= 24) {
             $articles = Article::with([
                 'images' => function($q) {
-                    $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
+                    $q->where('entity_type_id', EntityType::Article->value);
                 }
             ])
-                ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+                ->where(['status_id' => EntityStatus::Active->value])
                 ->orderBy('created_at', 'DESC')
                 ->simplePaginate($count);
         } else {
             $articles = Article::with([
                 'images' => function($q) {
-                    $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
+                    $q->where('entity_type_id', EntityType::Article->value);
                 }
             ])
-                ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+                ->where(['status_id' => EntityStatus::Active->value])
                 ->orderBy('created_at', 'DESC')
                 ->simplePaginate(4);
         }
 
-        return ArticleResource::collection($articles);
+        return ArticleData::collection($articles);
     }
 
     public function showOne(int $id): JsonResponse
@@ -48,7 +51,7 @@ class ArticleRepository implements ArticleRepositoryInterface
                     'profile' => function ($q) {
                         $q->with([
                             'images' => function ($q) {
-                                $q->where(['entity_type_id' => 3]);
+                                $q->where(['entity_type_id' => EntityType::Profile->value]);
                             }
                         ]);
                     }
@@ -56,16 +59,16 @@ class ArticleRepository implements ArticleRepositoryInterface
             },
             'entityStatus',
             'images' => function($q) {
-                $q->where(['entity_type_id' => EntityHelper::TYPE_ARTICLE]);
+                $q->where(['entity_type_id' => EntityType::Article->value]);
                 $q->orderBy('order');
             }
         ])
             ->where(['id' => $id])
-            ->get();
+            ->firstOrFail();
 
         return response()->json([
             'success' => true,
-            'data' => $article
+            'data' => ArticleData::from($article)
         ]);
     }
 }

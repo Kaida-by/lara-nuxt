@@ -34,25 +34,13 @@
             <span>Description: </span>
             <span v-html="article.description"></span>
           </el-row>
-          <el-row>
-            <span>Images: </span>
-            <div class="images_array flex gap-2.5">
-              <div class="image_item" v-for="image in article.images">
-                <el-image
-                  style="width: 200px; height: 200px"
-                  :src=image?.src alt="img"
-                  :preview-src-list="[image?.src]" fit=none>
-                </el-image>
-              </div>
-            </div>
-          </el-row>
         </div>
         <div class="is_active_article">
           <form @submit.prevent="update">
             <div class="approve">
               <div>Approve?</div>
               <label class="switch">
-                <input type="checkbox" v-if="article.status_id === 1" checked v-model="form.checked">
+                <input type="checkbox" v-if="article.statusId === 1" checked v-model="form.checked">
                 <input type="checkbox" v-else v-model="form.checked">
                 <div class="slider round"></div>
               </label>
@@ -91,7 +79,7 @@ export default {
     async fetchData() {
       await this.$axios.get('/admin/article/edit/' + this.$route.params.id)
         .then((res) => {
-          this.article = res.data.data[0]
+          this.article = res.data.data
         })
         .catch(err => console.log(err))
     },

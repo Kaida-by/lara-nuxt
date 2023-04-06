@@ -49,7 +49,7 @@
           <div v-else>
             <el-button round>prev</el-button>
           </div>
-          <div v-if="links.next !== null">
+          <div v-if="meta.next_page_url !== null">
             <el-button @click="nextPage" round>next</el-button>
           </div>
           <div v-else>
@@ -76,7 +76,7 @@ export default {
       page: 1,
       articles: [],
       categories: [],
-      links: {},
+      meta: {},
       search: '',
       searchInput: '',
     }
@@ -90,7 +90,7 @@ export default {
           }
         })
           .then(response => {
-            this.articles = response.data.data;
+            this.articles = response.data;
           })
           .catch(error => {
             console.log(error);
@@ -99,7 +99,7 @@ export default {
         await this.$axios.get('/admin/articles?page=' + this.page)
           .then((res) => {
             this.articles = res.data.data
-            this.links = res.data.links
+            this.meta = res.data.meta
           })
           .catch(err => console.log(err))
       }
@@ -108,7 +108,7 @@ export default {
       await this.$axios.get('/admin/articles?page=' + this.page)
         .then((res) => {
           this.articles = res.data.data
-          this.links = res.data.links
+          this.meta = res.data.meta
         })
         .catch(err => console.log(err))
     },

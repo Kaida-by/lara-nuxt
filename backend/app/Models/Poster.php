@@ -11,10 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Laravel\Scout\Searchable;
 
 class Poster extends Model implements EntityInterface
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $fillable = [
         'title',

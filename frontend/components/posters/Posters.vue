@@ -24,7 +24,7 @@
         <div v-else class="prev_btn">
           <el-button round>prev</el-button>
         </div>
-        <div v-if="links.next !== null" class="next_btn">
+        <div v-if="meta.next_page_url !== null" class="next_btn">
           <el-button @click="nextPage" round>next</el-button>
         </div>
         <div v-else class="next_btn">
@@ -39,7 +39,7 @@
       <div v-else>
         <el-button round>prev</el-button>
       </div>
-      <div v-if="links.next !== null">
+      <div v-if="meta.next_page_url !== null">
         <el-button @click="nextPage" round>next</el-button>
       </div>
       <div v-else>
@@ -60,7 +60,7 @@ export default {
     return {
       page: 1,
       posters: [],
-      links: {}
+      meta: {}
     }
   },
   methods: {
@@ -68,7 +68,7 @@ export default {
       await this.$axios.get('/posters?page=' + this.page + '&count=' + this.count)
         .then((res) => {
           this.posters = res.data.data
-          this.links = res.data.links
+          this.meta = res.data.meta
         })
         .catch(err => console.log(err))
     },
@@ -90,6 +90,7 @@ export default {
 <style scoped>
   .poster {
     display: flex;
+    z-index: 9;
   }
   .poster a {
     width: 100%;
