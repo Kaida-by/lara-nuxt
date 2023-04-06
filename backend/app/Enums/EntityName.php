@@ -1,0 +1,9 @@
+<?php
+
+namespace App\Enums;
+
+enum EntityName: string
+{
+    case Article = 'article';
+    case Poster = 'poster';
+}

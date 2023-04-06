@@ -7,10 +7,7 @@
           <div class="top_art_header">
             <h2>{{ poster.title }}</h2>
           </div>
-          <div v-if="poster.images[0]" class="top_art_img">
-            <el-image :src="poster.images[0].src" alt="" :preview-src-list="[poster.images[0].src]" fit=cover>
-            </el-image>
-          </div>
+
           <div class="med_art_text" v-html="poster.description"></div>
 
           <div>
@@ -63,7 +60,7 @@ export default {
     async fetchData() {
       await this.$axios.get('/poster/' + this.$route.params.id)
         .then((res) => {
-          this.poster = res.data.data[0]
+          this.poster = res.data.data
         })
         .catch(err => console.log(err))
     }

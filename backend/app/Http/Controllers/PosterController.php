@@ -7,7 +7,9 @@ namespace App\Http\Controllers;
 use App\Http\Repositories\PosterRepository;
 use App\Models\Poster;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class PosterController extends Controller
 {
@@ -15,7 +17,7 @@ class PosterController extends Controller
     {
     }
 
-    public function showAll(): AnonymousResourceCollection
+    public function showAll(): PaginatedDataCollection|CursorPaginatedDataCollection|DataCollection
     {
         return $this->posterRepository->showAll();
     }

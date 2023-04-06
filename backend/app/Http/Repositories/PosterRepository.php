@@ -4,40 +4,43 @@
 
 namespace App\Http\Repositories;
 
+use App\Data\ResourceData\PosterData;
+use App\Enums\EntityStatus;
+use App\Enums\EntityType;
 use App\Http\Interfaces\PosterRepositoryInterface;
-use App\Http\Resources\PosterResource;
-use App\Http\Services\EntityHelper;
 use App\Models\Poster;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\PaginatedDataCollection;
 
 class PosterRepository implements PosterRepositoryInterface
 {
-    public function showAll(): AnonymousResourceCollection
+    public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         $count = (int) request('count');
 
         if ($count && $count <= 24) {
             $posters = Poster::with([
                 'images' => function($q) {
-                    $q->where('entity_type_id', EntityHelper::TYPE_POSTERS);
+                    $q->where('entity_type_id', EntityType::Poster->value);
                 }
             ])
-                ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+                ->where(['status_id' => EntityStatus::Active->value])
                 ->orderBy('created_at', 'DESC')
                 ->simplePaginate($count);
         } else {
             $posters = Poster::with([
                 'images' => function($q) {
-                    $q->where('entity_type_id', EntityHelper::TYPE_POSTERS);
+                    $q->where('entity_type_id', EntityType::Poster->value);
                 }
             ])
-                ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+                ->where(['status_id' => EntityStatus::Active->value])
                 ->orderBy('created_at', 'DESC')
                 ->simplePaginate(4);
         }
 
-        return PosterResource::collection($posters);
+        return PosterData::collection($posters);
     }
 
     public function showOne(int $id): JsonResponse
@@ -48,7 +51,7 @@ class PosterRepository implements PosterRepositoryInterface
                     'profile' => function ($q) {
                         $q->with([
                             'images' => function ($q) {
-                                $q->where(['entity_type_id' => 3]);
+                                $q->where(['entity_type_id' => EntityType::Profile->value]);
                             }
                         ]);
                     }
@@ -56,16 +59,16 @@ class PosterRepository implements PosterRepositoryInterface
             },
             'entityStatus',
             'images' => function($q) {
-                $q->where(['entity_type_id' => EntityHelper::TYPE_POSTERS]);
+                $q->where(['entity_type_id' => EntityType::Poster->value]);
                 $q->orderBy('order');
             }
         ])
             ->where(['id' => $id])
-            ->get();
+            ->firstOrFail();
 
         return response()->json([
             'success' => true,
-            'data' => $poster
+            'data' => PosterData::from($poster)
         ]);
     }
 }

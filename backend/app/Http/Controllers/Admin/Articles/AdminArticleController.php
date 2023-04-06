@@ -2,42 +2,45 @@
 
 namespace App\Http\Controllers\Admin\Articles;
 
+use App\Data\ResourceData\ArticleData;
+use App\Enums\EntityCategory;
+use App\Enums\EntityName;
+use App\Enums\EntityType;
 use App\Events\Notifications;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminEntityRequest;
-use App\Http\Resources\ArticleResource;
 use App\Http\Services\EntityHelper;
 use App\Models\Article;
 use App\Models\Image;
 use App\Models\User;
 use App\Notifications\DeleteEntityNotification;
 use App\Notifications\PublishEntityNotification;
+use App\Notifications\UpdateEntityNotification;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Spatie\LaravelData\CursorPaginatedDataCollection;
+use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\PaginatedDataCollection;
 use Throwable;
 
 use function response;
 
 class AdminArticleController extends Controller
 {
-    public const CATEGORY = 2;
-    public const ENTITY_NAME = 'article';
-
-    public function showAll(): AnonymousResourceCollection
+    public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         $articles = Article::with([
             'images' => function($q) {
-                $q->where('entity_type_id', EntityHelper::TYPE_ARTICLE);
+                $q->where('entity_type_id', EntityType::Article->value);
             },
             'entityStatus',
             'user'
         ])
             ->simplePaginate(10);
 
-        return ArticleResource::collection($articles);
+        return ArticleData::collection($articles);
     }
 
     /**
@@ -45,7 +48,7 @@ class AdminArticleController extends Controller
      */
     public function getCategories(): JsonResponse
     {
-        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categoryId = (int) request('categoryId') ?: EntityCategory::Article->value;
         $categories = EntityHelper::getCategories($categoryId, 'article_category');
 
         return response()->json([
@@ -70,14 +73,19 @@ class AdminArticleController extends Controller
             }
         ])
             ->where(['id' => $id])
-            ->get();
+            ->firstOrFail();
 
         return response()->json([
             'success' => true,
-            'data' => $article
+            'data' => ArticleData::from($article)
         ]);
     }
 
+    /**
+     * @param int $id
+     * @param AdminEntityRequest $request
+     * @return void
+     */
     public function approve(int $id, AdminEntityRequest $request): void
     {
         /** @var Article $article */
@@ -88,7 +96,12 @@ class AdminArticleController extends Controller
 
         $article->update();
 
-        $user->notify(new PublishEntityNotification(self::ENTITY_NAME, $article->title));
+        if ($article->status_id === 1) {
+            $user->notify(new PublishEntityNotification(EntityName::Article-> value, $article->title));
+        } else {
+            $user->notify(new UpdateEntityNotification(EntityName::Article-> value, $article->title));
+        }
+
         event(new Notifications($article->user()->first()->id));
     }
 
@@ -119,7 +132,7 @@ class AdminArticleController extends Controller
                     Image::destroy(['id' => $image['id']]);
                 }
 
-                $article->user()->first()?->notify(new DeleteEntityNotification(self::ENTITY_NAME, $article->title));
+                $article->user()->first()?->notify(new DeleteEntityNotification(EntityName::Article-> value, $article->title));
                 event(new Notifications($article->user()->first()->id));
 
                 Article::destroy($id);

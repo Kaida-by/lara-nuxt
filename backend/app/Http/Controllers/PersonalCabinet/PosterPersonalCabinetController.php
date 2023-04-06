@@ -4,9 +4,11 @@
 
 namespace App\Http\Controllers\PersonalCabinet;
 
+use App\Data\RequestData\PosterData;
+use App\Enums\EntityCategory;
+use App\Enums\EntityStatus;
 use App\Events\Notifications;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PosterRequest;
 use App\Http\Resources\PosterResource;
 use App\Http\Services\EntityHelper;
 use App\Http\Services\UploadImagesService;
@@ -14,10 +16,10 @@ use App\Models\Poster;
 use App\Models\User;
 use App\Notifications\CreateEntityNotification;
 use App\Notifications\UpdateEntityNotification;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
 use Throwable;
@@ -42,7 +44,7 @@ class PosterPersonalCabinetController extends Controller
                 $q->where('entity_type_id', self::ENTITY_TYPE);
             }
         ])
-            ->where(['status_id' => EntityHelper::ENTITY_STATUS_ACTIVE])
+            ->where(['status_id' => EntityStatus::Active->value])
             ->where(['author_id' => $this->user()->profile->id])
             ->simplePaginate(10);
 
@@ -52,29 +54,27 @@ class PosterPersonalCabinetController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(PosterRequest $request): JsonResponse
+    public function store(PosterData $data): JsonResponse
     {
-        $validatedData = $request->validated();
-
-        $this->poster->title = $validatedData['title'];
-        $this->poster->description = $validatedData['description'];
-        $timestamp = strtotime($request->date);
+        $this->poster->title = $data->title;
+        $this->poster->description = $data->description;
+        $timestamp = strtotime($data->date);
         $this->poster->date = date('d/m/Y H:i:s', $timestamp);
-        $this->poster->price = $validatedData['price'];
+        $this->poster->price = $data->price;
         $this->poster->author_id = $this->user()->profile->id;
         $this->poster->entity_type_id = self::ENTITY_TYPE;
-        $this->poster->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
+        $this->poster->status_id = EntityStatus::UnderModeration->value;
 
         try {
             $this->poster->save();
             $currentId = Poster::latest()->first()->id ?? 0;
 
-            if ($request->files->get('files')) {
+            if (request()->files->get('files')) {
                 try {
                     UploadImagesService::save(
                         self::ENTITY_TYPE,
                         $currentId,
-                        $request->files->get('files')
+                        request()->files->get('files')
                     );
                 } catch (RuntimeException|Exception $exception) {
                     Poster::destroy($currentId);
@@ -97,7 +97,7 @@ class PosterPersonalCabinetController extends Controller
 
             return response()->json([
                 'success' => true,
-                'poster' => $this->poster
+                'poster' => $data
             ]);
         } catch (Exception $exception) {
             return response()->json([
@@ -146,32 +146,32 @@ class PosterPersonalCabinetController extends Controller
     /**
      * @throws Throwable
      */
-    public function update(PosterRequest $request, Poster $poster): JsonResponse
+    public function update(PosterData $data, Poster $poster): JsonResponse
     {
-        $tags = EntityHelper::getTagsFromDescription($request->description);
+        $tags = EntityHelper::getTagsFromDescription($data->description);
         $usedImagesUuid = UploadImagesService::getUsedImagesUuidFromHTMLTags($tags);
         UploadImagesService::removeUnusedImages($poster, $usedImagesUuid);
-        $timestamp = strtotime($request->date);
-        $dateTime = new \Illuminate\Support\Carbon($timestamp);
+        $timestamp = strtotime($data->date);
 
-        $categories = $request->get('categories');
-        $categoryIds = EntityHelper::getCategoriesIdFromCategoryArray($categories);
+        $dateTime = new Carbon($timestamp);
+
+        $categoryIds = EntityHelper::getCategoriesIdFromCategoryArray($data->categories);
 
         try {
             $poster->update([
-                'title' => $request->title,
-                'description' => $request->description,
+                'title' => $data->title,
+                'description' => $data->description,
                 'date' => $dateTime,
-                'price' => $request->price,
+                'price' => $data->price,
                 'author_id' => $this->user()->profile->id,
                 'entity_type_id' => self::ENTITY_TYPE,
-                'status_id' => EntityHelper::ENTITY_STATUS_UNDER_MODERATION,
+                'status_id' => EntityStatus::UnderModeration->value,
             ]);
 
             $poster->categories()->sync($categoryIds);
 
             UploadImagesService::upload(
-                $request->files->get('file'),
+                request()->files->get('file'),
                 self::ENTITY_TYPE,
                 $poster->id,
                 1,
@@ -186,7 +186,7 @@ class PosterPersonalCabinetController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $request['images']
+                'data' => $data
             ]);
         } catch (Exception $exception) {
             return response()->json([
@@ -210,7 +210,7 @@ class PosterPersonalCabinetController extends Controller
         $this->poster->description = '';
         $this->poster->author_id = $this->user()->profile->id;
         $this->poster->entity_type_id = self::ENTITY_TYPE;
-        $this->poster->status_id = EntityHelper::ENTITY_STATUS_UNDER_MODERATION;
+        $this->poster->status_id = EntityStatus::UnderModeration->value;
 
         try {
             $this->poster->save();
@@ -233,7 +233,7 @@ class PosterPersonalCabinetController extends Controller
      */
     public function getCategories(): JsonResponse
     {
-        $categoryId = (int) request('categoryId') ?: EntityHelper::IS_ARTICLE_CATEGORIES;
+        $categoryId = (int) request('categoryId') ?: EntityCategory::Article->value;
         $categories = EntityHelper::getCategories($categoryId, 'poster_category');
 
         return response()->json([
