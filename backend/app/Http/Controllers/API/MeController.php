@@ -16,9 +16,6 @@ class MeController extends Controller
         $this->auth = $auth;
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function index(): JsonResponse
     {
         return response()->json([
@@ -27,9 +24,6 @@ class MeController extends Controller
         ]);
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function logout(): JsonResponse
     {
         $this->auth->invalidate();

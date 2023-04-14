@@ -20,6 +20,7 @@ class ArticleData extends Data
         public int $statusId,
         public string $mainImageUrl,
         public string $created_at,
+        public string $updated_at,
         public User $user,
     ) {}
 
@@ -38,6 +39,7 @@ class ArticleData extends Data
             statusId: $article->status_id,
             mainImageUrl: EntityHelper::getUrlMainImageFromDescription($article->description),
             created_at: $article->created_at,
+            updated_at: $article->updated_at,
             user: $article->user,
         );
     }

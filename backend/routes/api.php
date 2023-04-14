@@ -68,7 +68,6 @@ Route::group(['middleware' => 'jwt.auth'], static function () {
         Route::get('/my-articles', [ArticlePersonalCabinetController::class, 'getMyArticles'])->name('pc.articles.index');
         Route::get('/article/create/', [ArticlePersonalCabinetController::class, 'create'])->name('articles.create');
         Route::get('/article/edit/{id}' ,[ArticlePersonalCabinetController::class, 'edit'])->name('article.edit');
-        Route::post('/article/store', [ArticlePersonalCabinetController::class, 'store'])->name('article.store');
         Route::post('/article/{article}', [ArticlePersonalCabinetController::class, 'update'])->name('article.update');
         Route::get('/get-article-categories', [ArticlePersonalCabinetController::class, 'getCategories'])->name('article.get-categories');
             //Create temporary Entity
@@ -78,7 +77,6 @@ Route::group(['middleware' => 'jwt.auth'], static function () {
         //Posters
         Route::get('/my-posters', [PosterPersonalCabinetController::class, 'getMyPosters'])->name('pc.posters.index');
         Route::get('/poster/edit/{id}' ,[PosterPersonalCabinetController::class, 'edit'])->name('poster.edit');
-        Route::post('/poster/store', [PosterPersonalCabinetController::class, 'store'])->name('poster.store');
         Route::post('/poster/{poster}', [PosterPersonalCabinetController::class, 'update'])->name('poster.update');
         Route::get('/get-poster-categories', [PosterPersonalCabinetController::class, 'getCategories'])->name('poster.get-categories');
             //Create temporary Entity
@@ -98,8 +96,8 @@ Route::group(['prefix' => '/admin'], static function () {
         Route::get('/article-categories', [AdminArticleController::class, 'getCategories'])->name('admin.article-categories.index');
             // Search
             Route::get('/article/search', [ArticleSearchController::class, 'search']);
-            //CountAllArticles
-            Route::get('/count-articles', [AdminArticleController::class, 'countAllArticles']);
+            //GetCountAllArticles
+            Route::get('/count-articles', [AdminArticleController::class, 'getCountAllArticles']);
 
         // Poster
         Route::get('/posters', [AdminPosterController::class, 'showAll'])->name('admin.posters.index');
@@ -110,5 +108,5 @@ Route::group(['prefix' => '/admin'], static function () {
             // Search
             Route::get('/poster/search', [PosterSearchController::class, 'search']);
             //CountAllPosters
-            Route::get('/count-posters', [AdminPosterController::class, 'countAllPosters']);
+            Route::get('/count-posters', [AdminPosterController::class, 'getCountAllPosters']);
 });

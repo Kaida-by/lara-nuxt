@@ -19,17 +19,17 @@
 
         <div v-if="!isShow">
           <div>Вы выбрали категории:</div>
-          <span v-for="category in form.categories">{{ category.title }}</span>
+          <span v-for="category in form.categoryIds">{{ category.title }}</span>
         </div>
         <div @click="isShow = !isShow">Изменить?</div>
 
         <div v-if="isShow">
           <div>Можно выбрать несколько категорий, путём зажатия клавиши "ctrl" и клика левой кнопки мышки</div>
-          <select multiple v-model="form.categories">
+          <select multiple v-model="form.categoryIds">
             <option v-for="category in categories" :value="category.title">{{ category.title }}</option>
           </select>
           <div>Вы выбрали категории:</div>
-          <span v-for="category in form.categories" v-if="!category.title">{{ category }}</span>
+          <span v-for="category in form.categoryIds" v-if="!category.title">{{ category }}</span>
         </div>
 
         <input type="submit" value="Update">
@@ -54,7 +54,7 @@ export default {
       form: {
         title: '',
         description: '',
-        categories: [],
+        categoryIds: [],
       },
       error: this.$route.query.error,
       categories: [],
@@ -65,8 +65,7 @@ export default {
     async fetchData() {
       await this.$axios.get('/article/edit/' + this.$route.params.id)
         .then((res) => {
-          const article = res.data.data[0]
-
+          const article = res.data
           for (let key in this.form) {
               this.form[key] = article[key]
           }

@@ -60,7 +60,7 @@ export default {
     async fetchData() {
       await this.$axios.get('/poster/' + this.$route.params.id)
         .then((res) => {
-          this.poster = res.data.data
+          this.poster = res.data
         })
         .catch(err => console.log(err))
     }

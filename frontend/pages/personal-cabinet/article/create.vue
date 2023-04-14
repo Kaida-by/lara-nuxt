@@ -97,7 +97,6 @@ export default {
       //     form.append(key, value)
       //   });
       // }
-      // await this.$axios.post('/article/store', form, {})
       try {
         await this.$axios.post('/article/' + this.cte_id, this.form, {})
       } catch (e) {
