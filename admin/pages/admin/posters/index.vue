@@ -24,9 +24,11 @@
               data.name.toLowerCase().includes(search.toLowerCase())
           )"
           style="width: 100%">
+          <el-table-column label="Id" prop="id"></el-table-column>
           <el-table-column sortable label="Title" prop="title"></el-table-column>
           <el-table-column sortable label="Status" prop="status.code"></el-table-column>
           <el-table-column sortable label="Created At" prop="created_at"></el-table-column>
+          <el-table-column sortable label="Updated At" prop="updated_at"></el-table-column>
           Search
           <el-table-column
             align="right">

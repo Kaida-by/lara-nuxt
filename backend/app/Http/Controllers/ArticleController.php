@@ -4,10 +4,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\ResourceData\ArticleData;
 use App\Http\Repositories\ArticleRepository;
 use App\Models\Article;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -18,12 +17,19 @@ class ArticleController extends Controller
     {
     }
 
+    /**
+     * @return DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
+     */
     public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         return $this->articleRepository->showAll();
     }
 
-    public function showOne(Article $article): JsonResponse
+    /**
+     * @param Article $article
+     * @return ArticleData
+     */
+    public function showOne(Article $article): ArticleData
     {
         return $this->articleRepository->showOne($article->id);
     }

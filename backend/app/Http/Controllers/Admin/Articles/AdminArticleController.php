@@ -1,24 +1,17 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Http\Controllers\Admin\Articles;
 
 use App\Data\ResourceData\ArticleData;
 use App\Enums\EntityCategory;
 use App\Enums\EntityName;
-use App\Events\Notifications;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminEntityRequest;
+use App\Http\Services\AbstractAdminEntityHelper;
 use App\Http\Services\EntityHelper;
 use App\Models\Article;
-use App\Models\Image;
-use App\Models\User;
-use App\Notifications\DeleteEntityNotification;
-use App\Notifications\PublishEntityNotification;
-use App\Notifications\UpdateEntityNotification;
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -26,27 +19,16 @@ use Throwable;
 
 use function response;
 
-class AdminArticleController extends Controller
+class AdminArticleController extends AbstractAdminEntityHelper
 {
     public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         $categoryId = (int) request('categoryId');
-
-        if ($categoryId === 0) {
-            $articles = Article::simplePaginate(10);
-        } else {
-            $articles = Article::whereHas('categories', static function ($q) use ($categoryId) {
-                    $q->where('category_id', $categoryId);
-                })
-                    ->simplePaginate(10);
-        }
+        $articles = $this->getAllEntityData(new Article(), $categoryId);
 
         return ArticleData::collection($articles);
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function getCategories(): JsonResponse
     {
         $categoryId = (int) request('categoryId') ?: EntityCategory::Article->value;
@@ -58,119 +40,25 @@ class AdminArticleController extends Controller
         ]);
     }
 
-    /**
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function edit(int $id): JsonResponse
+    public function edit(int $id): ArticleData
     {
-        $article = Article::with([
-            'user' => function($q) {
-                $q->with(['profile']);
-            },
-            'entityStatus',
-            'images' => function($q) {
-                $q->orderBy('order');
-            }
-        ])
-            ->where(['id' => $id])
-            ->firstOrFail();
+        $article = $this->getOneEntityData(new Article(), $id);
 
-        return response()->json([
-            'success' => true,
-            'data' => ArticleData::from($article)
-        ]);
+        return ArticleData::from($article);
     }
 
-    /**
-     * @param int $id
-     * @param AdminEntityRequest $request
-     * @return void
-     */
     public function approve(int $id, AdminEntityRequest $request): void
     {
-        /** @var Article $article */
-        $article = Article::find($id);
-        $article->status_id = !$request['checked'] ? 2 : 1;
-        /** @var User $user */
-        $user = $article->user;
-
-        $article->update();
-
-        if ($article->status_id === 1) {
-            $user->notify(new PublishEntityNotification(EntityName::Article-> value, $article->title));
-        } else {
-            $user->notify(new UpdateEntityNotification(EntityName::Article-> value, $article->title));
-        }
-
-        event(new Notifications($article->user()->first()->id));
+        $status = !$request['checked'] ? 2 : 1;
+        $this->approveEntity(new Article(), $id, $status, EntityName::Article-> value);
     }
 
-    /**
-     * @throws Throwable
-     */
     public function delete(int $id): JsonResponse
     {
-        /** @var Article $article */
-        $article = Article::with([
-            'images',
-            'user'
-        ])
-            ->where(['id' => $id])
-            ->first();
-
-        DB::beginTransaction();
-
-        try {
-            if (isset($article) && $article->images instanceof Collection) {
-                foreach ($article->images as $image) {
-                    $image = Image::find($image['id']);
-
-                    if ($image['is_local'] === 1) {
-                        unlink(public_path() . '/' . $image['src']);
-                    }
-
-                    Image::destroy(['id' => $image['id']]);
-                }
-
-                $article->user()->first()?->notify(new DeleteEntityNotification(EntityName::Article-> value, $article->title));
-                event(new Notifications($article->user()->first()->id));
-
-                Article::destroy($id);
-                DB::commit();
-
-
-                return response()->json([
-                    'success' => true,
-                ], 204);
-            }
-
-            return response()->json([
-                'success' => false,
-                'errors' => [
-                    'text' => [
-                        'Something went wrong.'
-                    ]
-                ]
-            ], 500);
-        } catch (Exception $exception) {
-            DB::rollBack();
-
-            return response()->json([
-                'success' => false,
-                'errors' => [
-                    'text' => [
-                        $exception->getMessage()
-                    ]
-                ]
-            ], 500);
-        }
+        return $this->deleteEntity(new Article(), $id, EntityName::Article-> value);
     }
 
-    /**
-     * @return int
-     */
-    public function countAllArticles(): int
+    public function getCountAllArticles(): int
     {
         return ArticleData::collection(Article::all())->count();
     }

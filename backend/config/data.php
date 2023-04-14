@@ -68,4 +68,11 @@ return [
      * which will only enable the caster locally.
      */
     'var_dumper_caster_mode' => 'development',
+
+    /**
+     * Count entities for different pages
+     */
+    'count_entities_for_main_page' => 4,
+    'count_entities_for_entity_page' => 24,
+    'count_entities_for_admin_page' => 10,
 ];

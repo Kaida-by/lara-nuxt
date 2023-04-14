@@ -79,7 +79,7 @@ export default {
     async fetchData() {
       await this.$axios.get('/admin/article/edit/' + this.$route.params.id)
         .then((res) => {
-          this.article = res.data.data
+          this.article = res.data
         })
         .catch(err => console.log(err))
     },

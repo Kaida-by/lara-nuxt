@@ -13,4 +13,6 @@ class ArticleData extends Data
     public string $title;
     #[Required, StringType, Max(65000)]
     public string $description;
+    #[Required]
+    public array $categoryIds;
 }

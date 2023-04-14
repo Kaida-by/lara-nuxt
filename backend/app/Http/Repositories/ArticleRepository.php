@@ -8,67 +8,33 @@ use App\Data\ResourceData\ArticleData;
 use App\Enums\EntityStatus;
 use App\Enums\EntityType;
 use App\Http\Interfaces\ArticleRepositoryInterface;
+use App\Http\Services\AbstractEntityHelper;
 use App\Models\Article;
-use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
-use function response;
 
-class ArticleRepository implements ArticleRepositoryInterface
+class ArticleRepository extends AbstractEntityHelper implements ArticleRepositoryInterface
 {
+    /**
+     * @return DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
+     */
     public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         $count = (int) request('count');
-        if ($count && $count <= 24) {
-            $articles = Article::with([
-                'images' => function($q) {
-                    $q->where('entity_type_id', EntityType::Article->value);
-                }
-            ])
-                ->where(['status_id' => EntityStatus::Active->value])
-                ->orderBy('created_at', 'DESC')
-                ->simplePaginate($count);
-        } else {
-            $articles = Article::with([
-                'images' => function($q) {
-                    $q->where('entity_type_id', EntityType::Article->value);
-                }
-            ])
-                ->where(['status_id' => EntityStatus::Active->value])
-                ->orderBy('created_at', 'DESC')
-                ->simplePaginate(4);
-        }
+        $articles = $this->getAllEntityData(new Article(), $count, EntityType::Article->value, EntityStatus::Active->value);
 
         return ArticleData::collection($articles);
     }
 
-    public function showOne(int $id): JsonResponse
+    /**
+     * @param int $id
+     * @return ArticleData
+     */
+    public function showOne(int $id): ArticleData
     {
-        $article = Article::with([
-            'user' => function($q) {
-                $q->with([
-                    'profile' => function ($q) {
-                        $q->with([
-                            'images' => function ($q) {
-                                $q->where(['entity_type_id' => EntityType::Profile->value]);
-                            }
-                        ]);
-                    }
-                ]);
-            },
-            'entityStatus',
-            'images' => function($q) {
-                $q->where(['entity_type_id' => EntityType::Article->value]);
-                $q->orderBy('order');
-            }
-        ])
-            ->where(['id' => $id])
-            ->firstOrFail();
+        $article = $this->getOneEntityData(new Article(), $id, EntityType::Article->value);
 
-        return response()->json([
-            'success' => true,
-            'data' => ArticleData::from($article)
-        ]);
+        return ArticleData::from($article);
     }
 }

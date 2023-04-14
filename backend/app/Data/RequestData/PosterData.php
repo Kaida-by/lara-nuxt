@@ -20,5 +20,5 @@ class PosterData extends Data
     #[Required, Numeric, Between(0, 1000000.99)]
     public float $price;
     #[Required]
-    public array $categories;
+    public array $categoryIds;
 }
