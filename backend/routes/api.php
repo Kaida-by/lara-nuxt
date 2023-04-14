@@ -98,6 +98,8 @@ Route::group(['prefix' => '/admin'], static function () {
         Route::get('/article-categories', [AdminArticleController::class, 'getCategories'])->name('admin.article-categories.index');
             // Search
             Route::get('/article/search', [ArticleSearchController::class, 'search']);
+            //CountAllArticles
+            Route::get('/count-articles', [AdminArticleController::class, 'countAllArticles']);
 
         // Poster
         Route::get('/posters', [AdminPosterController::class, 'showAll'])->name('admin.posters.index');
@@ -107,4 +109,6 @@ Route::group(['prefix' => '/admin'], static function () {
         Route::get('/poster-categories', [AdminPosterController::class, 'getCategories'])->name('admin.poster-categories.index');
             // Search
             Route::get('/poster/search', [PosterSearchController::class, 'search']);
+            //CountAllPosters
+            Route::get('/count-posters', [AdminPosterController::class, 'countAllPosters']);
 });

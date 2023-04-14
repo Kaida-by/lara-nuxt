@@ -5,7 +5,11 @@
 
       <div class="left_area">
         <div class="columns_categories">
-          <div class="category" v-for="category in categories">
+          <div class="category" @click.prevent="filterByCategory(0)">
+            <div class="title">Все</div>
+            <div class="count_article">{{ countArticles }}</div>
+          </div>
+          <div class="category" v-for="category in categories" @click.prevent="filterByCategory(category.id)">
             <div class="title">{{ category.title }}</div>
             <div class="count_article">{{ category.cat }}</div>
           </div>
@@ -15,11 +19,14 @@
       <div class="right_area">
         <el-table
           stripe
-          :data="articles.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+          :data="articles.filter(
+              data => !search ||
+              data.name.toLowerCase().includes(search.toLowerCase())
+          )"
           style="width: 100%">
-          <el-table-column label="Title" prop="title"></el-table-column>
-          <el-table-column label="User email" prop="user.email"></el-table-column>
-<!--          <el-table-column label="Description" prop="description"></el-table-column>-->
+          <el-table-column sortable label="Title" prop="title"></el-table-column>
+          <el-table-column sortable label="Status" prop="status.code"></el-table-column>
+          <el-table-column sortable label="Created At" prop="created_at"></el-table-column>
           Search
           <el-table-column
             align="right">
@@ -76,9 +83,11 @@ export default {
       page: 1,
       articles: [],
       categories: [],
+      countArticles: 0,
       meta: {},
       search: '',
       searchInput: '',
+      categoryId: 0,
     }
   },
   methods: {
@@ -105,7 +114,10 @@ export default {
       }
     },
     async fetchData() {
-      await this.$axios.get('/admin/articles?page=' + this.page)
+      await this.$axios.get(
+          '/admin/articles?page=' + this.page +
+          '&categoryId=' + this.categoryId
+      )
         .then((res) => {
           this.articles = res.data.data
           this.meta = res.data.meta
@@ -137,11 +149,23 @@ export default {
           return;
         }
       }
-    }
+    },
+    async countAllArticles() {
+      await this.$axios.get('/admin/count-articles/')
+          .then((res) => {
+            this.countArticles = res.data
+          })
+          .catch(err => console.log(err))
+    },
+    filterByCategory(id) {
+      this.categoryId = id;
+      this.fetchData()
+    },
   },
   mounted () {
     this.fetchData()
     this.fetchDataCategories()
+    this.countAllArticles()
   }
 }
 </script>

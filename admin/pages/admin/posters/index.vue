@@ -5,7 +5,11 @@
 
       <div class="left_area">
         <div class="columns_categories">
-          <div class="category" v-for="category in categories">
+          <div class="category" @click.prevent="filterByCategory(0)">
+            <div class="title">Все</div>
+            <div class="count_poster">{{ countPosters }}</div>
+          </div>
+          <div class="category" v-for="category in categories" @click.prevent="filterByCategory(category.id)">
             <div class="title">{{ category.title }}</div>
             <div class="count_poster">{{ category.cat }}</div>
           </div>
@@ -15,11 +19,14 @@
       <div class="right_area">
         <el-table
           stripe
-          :data="posters.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+          :data="posters.filter(
+              data => !search ||
+              data.name.toLowerCase().includes(search.toLowerCase())
+          )"
           style="width: 100%">
-          <el-table-column label="Title" prop="title"></el-table-column>
-          <el-table-column label="User email" prop="user.email"></el-table-column>
-<!--          <el-table-column label="Description" prop="description"></el-table-column>-->
+          <el-table-column sortable label="Title" prop="title"></el-table-column>
+          <el-table-column sortable label="Status" prop="status.code"></el-table-column>
+          <el-table-column sortable label="Created At" prop="created_at"></el-table-column>
           Search
           <el-table-column
             align="right">
@@ -38,7 +45,7 @@
               </nuxt-link>
               <el-button
                 size="mini"
-                type="danger" @click="deleteArticle(posters[scope.$index].id)">Delete</el-button>
+                type="danger" @click="deletePoster(posters[scope.$index].id)">Delete</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -76,9 +83,11 @@ export default {
       page: 1,
       posters: [],
       categories: [],
+      countPosters: 0,
       meta: {},
       search: '',
       searchInput: '',
+      categoryId: 0,
     }
   },
   methods: {
@@ -105,7 +114,10 @@ export default {
       }
     },
     async fetchData() {
-      await this.$axios.get('/admin/posters?page=' + this.page)
+      await this.$axios.get(
+          '/admin/posters?page=' + this.page +
+          '&categoryId=' + this.categoryId
+      )
         .then((res) => {
           this.posters = res.data.data
           this.meta = res.data.meta
@@ -127,8 +139,8 @@ export default {
         })
         .catch(err => console.log(err))
     },
-    deleteArticle(id) {
-      if (confirm("Do you really want to delete this Article?")) {
+    deletePoster(id) {
+      if (confirm("Do you really want to delete this Poster?")) {
         try {
           this.$axios.delete('/admin/poster/delete/' + id).then(response => {
             this.fetchData();
@@ -137,11 +149,23 @@ export default {
           return;
         }
       }
-    }
+    },
+    async countAllPosters() {
+      await this.$axios.get('/admin/count-posters/')
+          .then((res) => {
+            this.countPosters = res.data
+          })
+          .catch(err => console.log(err))
+    },
+    filterByCategory(id) {
+      this.categoryId = id;
+      this.fetchData()
+    },
   },
   mounted () {
     this.fetchData()
     this.fetchDataCategories()
+    this.countAllPosters()
   }
 }
 </script>
