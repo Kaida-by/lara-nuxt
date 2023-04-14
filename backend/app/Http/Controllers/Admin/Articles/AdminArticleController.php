@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin\Articles;
 use App\Data\ResourceData\ArticleData;
 use App\Enums\EntityCategory;
 use App\Enums\EntityName;
-use App\Enums\EntityType;
 use App\Events\Notifications;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminEntityRequest;
@@ -31,14 +30,16 @@ class AdminArticleController extends Controller
 {
     public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
-        $articles = Article::with([
-            'images' => function($q) {
-                $q->where('entity_type_id', EntityType::Article->value);
-            },
-            'entityStatus',
-            'user'
-        ])
-            ->simplePaginate(10);
+        $categoryId = (int) request('categoryId');
+
+        if ($categoryId === 0) {
+            $articles = Article::simplePaginate(10);
+        } else {
+            $articles = Article::whereHas('categories', static function ($q) use ($categoryId) {
+                    $q->where('category_id', $categoryId);
+                })
+                    ->simplePaginate(10);
+        }
 
         return ArticleData::collection($articles);
     }
@@ -164,5 +165,13 @@ class AdminArticleController extends Controller
                 ]
             ], 500);
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function countAllArticles(): int
+    {
+        return ArticleData::collection(Article::all())->count();
     }
 }

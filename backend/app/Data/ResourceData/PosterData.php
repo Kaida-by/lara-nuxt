@@ -3,7 +3,6 @@
 
 namespace App\Data\ResourceData;
 
-use App\Enums\EntityStatus;
 use App\Http\Services\EntityHelper;
 use App\Models\Poster;
 use App\Models\User;
@@ -17,6 +16,7 @@ class PosterData extends Data
         public string $description,
         public string $date,
         public float $price,
+        public $status,
         public int $statusId,
         public string $mainImageUrl,
         public string $created_at,
@@ -35,6 +35,7 @@ class PosterData extends Data
             description: $poster->description,
             date: $poster->date,
             price: $poster->price,
+            status: $poster->entityStatus,
             statusId: $poster->status_id,
             mainImageUrl: EntityHelper::getUrlMainImageFromDescription($poster->description),
             created_at: $poster->created_at,

@@ -3,7 +3,6 @@
 
 namespace App\Data\ResourceData;
 
-use App\Enums\EntityStatus;
 use App\Http\Services\EntityHelper;
 use App\Models\Article;
 use App\Models\User;
@@ -17,6 +16,7 @@ class ArticleData extends Data
         public string $title,
         public string $description,
         public Collection $categoryIds,
+        public $status,
         public int $statusId,
         public string $mainImageUrl,
         public string $created_at,
@@ -34,6 +34,7 @@ class ArticleData extends Data
             title: $article->title,
             description: $article->description,
             categoryIds: $article->categories,
+            status: $article->entityStatus,
             statusId: $article->status_id,
             mainImageUrl: EntityHelper::getUrlMainImageFromDescription($article->description),
             created_at: $article->created_at,
