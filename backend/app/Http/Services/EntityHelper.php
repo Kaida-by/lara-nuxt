@@ -13,10 +13,6 @@ use RecursiveIteratorIterator;
 
 class EntityHelper
 {
-    /**
-     * @param string $description
-     * @return string|static
-     */
     public static function getUrlMainImageFromDescription(string $description): string|static
     {
         if ($description) {
@@ -28,10 +24,6 @@ class EntityHelper
         return '';
     }
 
-    /**
-     * @param string $description
-     * @return array
-     */
     public static function getTagsFromDescription(string $description): array
     {
         $dom = new DOMDocument;
@@ -54,10 +46,6 @@ class EntityHelper
         return $output;
     }
 
-    /**
-     * @param DOMNode $element
-     * @return string
-     */
     public static function getInnerHTML(DOMNode $element): string
     {
         $innerHTML = '';
@@ -70,10 +58,6 @@ class EntityHelper
         return $innerHTML;
     }
 
-    /**
-     * @param array $tags
-     * @return string
-     */
     public static function getMainImageFromTags(array $tags): string
     {
         $path = '';
@@ -88,10 +72,6 @@ class EntityHelper
         return $path;
     }
 
-    /**
-     * @param int $categoryId
-     * @return Collection
-     */
     public static function getCategories(int $categoryId, string $relationTable): Collection
     {
         return DB::table('categories', 'cat')
@@ -102,10 +82,6 @@ class EntityHelper
             ->get();
     }
 
-    /**
-     * @param array $categories
-     * @return array
-     */
     public static function getCategoriesIdFromCategoryArray(array $categories): array
     {
         if (isset($categories[0]['id'])) {
@@ -122,5 +98,12 @@ class EntityHelper
 
             return $acc;
         }, []);
+    }
+
+    public static function getFinallyPhone(string $str): string
+    {
+        $phoneWithCode = str_replace([' ', '(', ')'], '', $str);
+
+        return substr($phoneWithCode, 4);
     }
 }

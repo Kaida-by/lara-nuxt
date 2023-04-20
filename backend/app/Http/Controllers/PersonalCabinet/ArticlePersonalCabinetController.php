@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 
@@ -43,7 +44,7 @@ class ArticlePersonalCabinetController extends AbstractPersonalCabinetHelper
 
     public function edit(int $id): ArticleDataResource
     {
-        $article = $this->getOneEntity(new Article(), $id);
+        $article = $this->getOneEntity(new Article(), $id, EntityType::Article->value);
 
         return ArticleDataResource::from($article);
     }

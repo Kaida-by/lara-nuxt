@@ -5,32 +5,32 @@
 namespace App\Http\Controllers;
 
 use App\Data\ResourceData\PosterData;
-use App\Http\Repositories\PosterRepository;
+use App\Enums\EntityStatus;
+use App\Enums\EntityType;
+use App\Http\Interfaces\PosterInterface;
 use App\Models\Poster;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 
-class PosterController extends Controller
+class PosterController extends AbstractController implements PosterInterface
 {
-    public function __construct(public Poster $poster, private readonly PosterRepository $posterRepository)
+    public function __construct(public Poster $poster)
     {
     }
 
-    /**
-     * @return PaginatedDataCollection|CursorPaginatedDataCollection|DataCollection
-     */
     public function showAll(): PaginatedDataCollection|CursorPaginatedDataCollection|DataCollection
     {
-        return $this->posterRepository->showAll();
+        $count = (int) request('count');
+        $posters = $this->getAll($this->poster, $count, EntityType::Poster->value, EntityStatus::Active->value);
+
+        return PosterData::collection($posters);
     }
 
-    /**
-     * @param Poster $poster
-     * @return PosterData
-     */
-    public function showOne(Poster $poster): PosterData
+    public function showOne(int $id): PosterData
     {
-        return $this->posterRepository->showOne($poster->id);
+        $poster = $this->getOne($this->poster, $id, EntityType::Profile->value);
+
+        return PosterData::from($poster);
     }
 }

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\Posters;
 use App\Data\ResourceData\PosterData;
 use App\Enums\EntityCategory;
 use App\Enums\EntityName;
+use App\Enums\EntityType;
 use App\Http\Requests\AdminEntityRequest;
 use App\Http\Services\AbstractAdminEntityHelper;
 use App\Http\Services\EntityHelper;
@@ -42,7 +43,7 @@ class AdminPosterController extends AbstractAdminEntityHelper
 
     public function edit(int $id): PosterData
     {
-        $poster = $this->getOneEntityData(new Poster(), $id);
+        $poster = $this->getOneEntityData(new Poster(), $id, EntityType::Poster->value);
 
         return PosterData::from($poster);
     }

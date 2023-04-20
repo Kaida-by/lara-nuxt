@@ -5,32 +5,32 @@
 namespace App\Http\Controllers;
 
 use App\Data\ResourceData\ArticleData;
-use App\Http\Repositories\ArticleRepository;
+use App\Enums\EntityStatus;
+use App\Enums\EntityType;
+use App\Http\Interfaces\ArticleInterface;
 use App\Models\Article;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
 
-class ArticleController extends Controller
+class ArticleController extends AbstractController implements ArticleInterface
 {
-    public function __construct(public Article $article, private readonly ArticleRepository $articleRepository)
+    public function __construct(public Article $article)
     {
     }
 
-    /**
-     * @return DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
-     */
     public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
-        return $this->articleRepository->showAll();
+        $count = (int) request('count');
+        $articles = $this->getAll($this->article, $count, EntityType::Article->value, EntityStatus::Active->value);
+
+        return ArticleData::collection($articles);
     }
 
-    /**
-     * @param Article $article
-     * @return ArticleData
-     */
-    public function showOne(Article $article): ArticleData
+    public function showOne(int $id): ArticleData
     {
-        return $this->articleRepository->showOne($article->id);
+        $article = $this->getOne($this->article, $id, EntityType::Article->value);
+
+        return ArticleData::from($article);
     }
 }

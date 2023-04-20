@@ -24,10 +24,6 @@ class ArticleData extends Data
         public User $user,
     ) {}
 
-    /**
-     * @param Article $article
-     * @return static
-     */
     public static function fromModel(Article $article): self
     {
         return new self(

@@ -23,6 +23,7 @@
               data => !search ||
               data.name.toLowerCase().includes(search.toLowerCase())
           )"
+          empty-text="No data"
           style="width: 100%">
           <el-table-column label="Id" prop="id"></el-table-column>
           <el-table-column sortable label="Title" prop="title"></el-table-column>

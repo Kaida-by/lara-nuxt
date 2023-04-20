@@ -30,6 +30,12 @@
       <div class="bot_header_in">
         <nuxt-link to="/posters">Posters</nuxt-link>
       </div>
+      <div class="bot_header_in">
+        <nuxt-link to="/cvs">CVs</nuxt-link>
+      </div>
+      <div class="bot_header_in">
+        <nuxt-link to="/vacancies">Vacancies</nuxt-link>
+      </div>
     </div>
   </div>
 </template>

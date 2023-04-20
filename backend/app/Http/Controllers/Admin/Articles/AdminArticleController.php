@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\Articles;
 use App\Data\ResourceData\ArticleData;
 use App\Enums\EntityCategory;
 use App\Enums\EntityName;
+use App\Enums\EntityType;
 use App\Http\Requests\AdminEntityRequest;
 use App\Http\Services\AbstractAdminEntityHelper;
 use App\Http\Services\EntityHelper;
@@ -42,7 +43,7 @@ class AdminArticleController extends AbstractAdminEntityHelper
 
     public function edit(int $id): ArticleData
     {
-        $article = $this->getOneEntityData(new Article(), $id);
+        $article = $this->getOneEntityData(new Article(), $id, EntityType::Article->value);
 
         return ArticleData::from($article);
     }

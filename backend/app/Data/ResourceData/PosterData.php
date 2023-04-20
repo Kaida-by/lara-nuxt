@@ -26,10 +26,6 @@ class PosterData extends Data
         public User $user,
     ) {}
 
-    /**
-     * @param Poster $poster
-     * @return static
-     */
     public static function fromModel(Poster $poster): self
     {
         return new self(

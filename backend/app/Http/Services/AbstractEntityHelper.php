@@ -42,7 +42,7 @@ abstract class AbstractEntityHelper
      * @param int $entityType
      * @return mixed
      */
-    protected function getOneEntityData(EntityInterface $entity, int $id, int $entityType): mixed
+    protected function getOneEntityData(EntityInterface $entity, int $id, int $entityType): EntityInterface
     {
         return $entity::with([
             'user' => function($q) use ($entityType) {
@@ -60,9 +60,13 @@ abstract class AbstractEntityHelper
             'images' => function($q) use ($entityType) {
                 $q->where(['entity_type_id' => $entityType]);
                 $q->orderBy('order');
-            }
+            },
         ])
+            ->whereHas('phone', function($q) use ($entityType) {
+                    $q->where(['entity_type_id' => $entityType]);
+                }
+            )
             ->where(['id' => $id])
-            ->firstOrFail();
+            ->first();
     }
 }
