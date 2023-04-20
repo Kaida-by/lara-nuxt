@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 
@@ -7,6 +8,7 @@ namespace App\Http\Controllers\PersonalCabinet;
 use App\Data\RequestData\PosterData;
 use App\Data\ResourceData\PosterData as PosterDataResource;
 use App\Enums\EntityCategory;
+use App\Enums\EntityName;
 use App\Enums\EntityStatus;
 use App\Enums\EntityType;
 use App\Events\Notifications;
@@ -28,9 +30,6 @@ use function response;
 
 class PosterPersonalCabinetController extends AbstractPersonalCabinetHelper
 {
-    public const ENTITY_TYPE = 9;
-    public const ENTITY_NAME = 'poster';
-
     protected Poster $poster;
 
     public function __construct(Poster $poster)
@@ -47,7 +46,7 @@ class PosterPersonalCabinetController extends AbstractPersonalCabinetHelper
 
     public function edit(int $id): PosterDataResource
     {
-        $poster = $this->getOneEntity(new Poster(), $id);
+        $poster = $this->getOneEntity(new Poster(), $id, EntityType::Poster->value);
 
         return PosterDataResource::from($poster);
     }
@@ -70,7 +69,7 @@ class PosterPersonalCabinetController extends AbstractPersonalCabinetHelper
                 'date' => $dateTime,
                 'price' => $data->price,
                 'author_id' => $this->user()->profile->id,
-                'entity_type_id' => self::ENTITY_TYPE,
+                'entity_type_id' => EntityType::Poster->value,
                 'status_id' => EntityStatus::UnderModeration->value,
             ]);
 
@@ -78,16 +77,15 @@ class PosterPersonalCabinetController extends AbstractPersonalCabinetHelper
 
             UploadImagesService::upload(
                 request()->files->get('file'),
-                self::ENTITY_TYPE,
+                EntityType::Poster->value,
                 $poster->id,
                 1,
                 true,
-                true
             );
 
             /** @var User $user */
             $user = Auth::user();
-            $user->notify(new UpdateEntityNotification(self::ENTITY_NAME, $poster->title));
+            $user->notify(new UpdateEntityNotification(EntityName::Poster->value, $poster->title));
             event(new Notifications($user->id));
 
             return response()->json([
@@ -112,7 +110,7 @@ class PosterPersonalCabinetController extends AbstractPersonalCabinetHelper
         $this->poster->title = '';
         $this->poster->description = '';
         $this->poster->author_id = $this->user()->profile->id;
-        $this->poster->entity_type_id = self::ENTITY_TYPE;
+        $this->poster->entity_type_id = EntityType::Poster->value;
         $this->poster->status_id = EntityStatus::UnderModeration->value;
 
         try {

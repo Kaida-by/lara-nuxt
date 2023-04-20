@@ -15,8 +15,7 @@ class CreatePhonesTable extends Migration
     {
         Schema::create('phones', function (Blueprint $table) {
             $table->id();
-            $table->integer('code');
-            $table->integer('number');
+            $table->integer('number')->unique();
             $table->unsignedBigInteger('entity_type_id');
             $table->bigInteger('entity_id');
 

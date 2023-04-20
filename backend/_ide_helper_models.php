@@ -85,11 +85,14 @@ namespace App\Models{
  * @property int $id
  * @property string $title
  * @property string $description
+ * @property string $phone
  * @property int $author_id
  * @property int $entity_type_id
  * @property int $status_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\EntityStatus|null $entityStatus
  * @method static \Illuminate\Database\Eloquent\Builder|CV newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CV newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CV query()
@@ -253,6 +256,7 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $phone
+ * @property string $number
  * @property int $entity_type_id
  * @property int $entity_id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -512,13 +516,14 @@ namespace App\Models{
  * @property int $id
  * @property string $title
  * @property string $description
- * @property float $salary
- * @property int $salary_id
+ * @property string $phone
  * @property int $author_id
  * @property int $entity_type_id
  * @property int $status_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $user
+ * @property-read \App\Models\EntityStatus|null $entityStatus
  * @method static \Illuminate\Database\Eloquent\Builder|Vacancy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Vacancy newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Vacancy query()

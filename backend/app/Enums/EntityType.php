@@ -11,7 +11,7 @@ enum EntityType: int
     case PhotoFact = 5;
     case Organization = 6;
     case Vacancy = 7;
-    case Cv = 8;
+    case CV = 8;
     case Poster = 9;
     case PhotoGallery = 10;
     case Static = 11;

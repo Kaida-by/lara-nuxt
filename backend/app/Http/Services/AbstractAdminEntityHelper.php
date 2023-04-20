@@ -4,6 +4,7 @@
 
 namespace App\Http\Services;
 
+use App\Contracts\HasPhone;
 use App\Events\Notifications;
 use App\Http\Interfaces\EntityInterface;
 use App\Models\Image;
@@ -38,8 +39,21 @@ abstract class AbstractAdminEntityHelper
      * @param int $id
      * @return mixed
      */
-    protected function getOneEntityData(EntityInterface $entity, int $id): mixed
+    protected function getOneEntityData(EntityInterface $entity, int $id, string $entityType): mixed
     {
+        if ($entity instanceof HasPhone) {
+            return $entity::with([
+                'user' => function($q) {
+                    $q->with(['profile']);
+                },
+                'entityStatus',
+                'phone' => function($q) use ($entityType) {
+                    $q->where(['entity_type_id' => $entityType]);
+                }
+            ])
+                ->where(['id' => $id])
+                ->firstOrFail();
+        }
         return $entity::with([
             'user' => function($q) {
                 $q->with(['profile']);

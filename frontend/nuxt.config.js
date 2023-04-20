@@ -38,6 +38,7 @@ export default {
     './plugins/vuedraggable.js',
     './plugins/element-ui.js',
     './plugins/echo.js',
+    './plugins/v-mask.js',
     { src: '~/plugins/vue-datetime-picker', ssr: false },
   ],
 
