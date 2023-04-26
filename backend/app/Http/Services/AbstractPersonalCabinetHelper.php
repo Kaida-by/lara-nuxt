@@ -11,7 +11,12 @@ abstract class AbstractPersonalCabinetHelper extends Controller
     protected function getAllEntities(EntityInterface $entity, int $entityType, int $entityStatus): mixed
     {
         if ($entity instanceof HasPhone) {
-            return $entity::where(['author_id' => $this->user()->profile->id])
+            return $entity::with([
+                'phone' => function($q) use ($entityType) {
+                    $q->where(['entity_type_id' => $entityType]);
+                }
+            ])
+                ->where(['author_id' => $this->user()->profile->id])
                 ->simplePaginate(config('data.count_entities_for_admin_page'));
         }
 
