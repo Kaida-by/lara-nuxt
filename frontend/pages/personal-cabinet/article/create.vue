@@ -24,11 +24,11 @@
 
       <div>
         <div>Можно выбрать несколько категорий, путём зажатия клавиши "ctrl" и клика левой кнопки мышки</div>
-        <select multiple v-model="form.categories">
+        <select multiple v-model="form.categoryIds">
           <option v-for="category in categories" :value="category.title">{{ category.title }}</option>
         </select>
         <div>Вы выбрали категории:</div>
-          <span v-for="category in form.categories">{{ category }}</span>
+          <span v-for="category in form.categoryIds">{{ category }}</span>
       </div>
 
       <input type="submit" value="Create">
@@ -57,7 +57,7 @@ export default {
         title: '',
         description: '',
         author_id: this.$auth.user.id,
-        categories: [],
+        categoryIds: [],
         // mainFile: [],
       },
       file: '',

@@ -29,7 +29,9 @@ export default {
       form: {
         title: '',
         description: '',
-        phone: '',
+        phone: {
+          number: ''
+        },
       },
       error: this.$route.query.error,
     }

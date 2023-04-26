@@ -52,10 +52,10 @@ class CVPersonalCabinetController extends AbstractPersonalCabinetHelper
     public function update(CVData $data, CV $cv): JsonResponse
     {
         try {
-            $phoneNumber = EntityHelper::getFinallyPhone($data->phone['number']);
+            $phoneNumber = EntityHelper::getFinallyPhone($data->phone->number);
 
-            if (array_key_exists('id', $data->phone)) {
-                $phone = Phone::find($data->phone['id']);
+            if ($data->phone->id) {
+                $phone = Phone::find($data->phone->id);
                 $phone->update([
                     'number' => $phoneNumber
                 ]);
