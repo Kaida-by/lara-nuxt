@@ -17,28 +17,25 @@ use Illuminate\Http\JsonResponse;
 
 abstract class AbstractAdminEntityHelper
 {
-    /**
-     * @param EntityInterface $entity
-     * @param int $categoryId
-     * @return mixed
-     */
     protected function getAllEntityData(EntityInterface $entity, int $categoryId): mixed
     {
         if ($categoryId === 0) {
-            return $entity::simplePaginate(config('data.count_entities_for_admin_page'));
+            if ($entity instanceof HasPhone) {
+                return $entity::whereHas('phone')
+                    ->where('title', '!=', '')
+                    ->simplePaginate(config('data.count_entities_for_admin_page'));
+            }
+
+            return $entity::where('title', '!=', '')->simplePaginate(config('data.count_entities_for_admin_page'));
         }
 
         return $entity::whereHas('categories', static function ($q) use ($categoryId) {
             $q->where('category_id', $categoryId);
         })
+            ->where('title', '!=', '')
             ->simplePaginate(config('data.count_entities_for_admin_page'));
     }
 
-    /**
-     * @param EntityInterface $entity
-     * @param int $id
-     * @return mixed
-     */
     protected function getOneEntityData(EntityInterface $entity, int $id, string $entityType): mixed
     {
         if ($entity instanceof HasPhone) {
@@ -67,13 +64,6 @@ abstract class AbstractAdminEntityHelper
             ->firstOrFail();
     }
 
-    /**
-     * @param EntityInterface $entity
-     * @param int $id
-     * @param int $status
-     * @param string $entityName
-     * @return void
-     */
     protected function approveEntity(EntityInterface $entity, int $id, int $status, string $entityName): void
     {
         $newEntity = $entity::find($id);
@@ -91,12 +81,6 @@ abstract class AbstractAdminEntityHelper
         event(new Notifications($newEntity->user()->first()->id));
     }
 
-    /**
-     * @param EntityInterface $entity
-     * @param int $id
-     * @param string $entityName
-     * @return JsonResponse
-     */
     protected function deleteEntity(EntityInterface $entity, int $id, string $entityName): JsonResponse
     {
         $newEntity = $entity::with([
