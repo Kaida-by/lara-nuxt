@@ -3,7 +3,6 @@
 
 namespace App\Data\ResourceData;
 
-use App\Models\CV;
 use App\Models\Phone;
 use App\Models\User;
 use App\Models\Vacancy;
