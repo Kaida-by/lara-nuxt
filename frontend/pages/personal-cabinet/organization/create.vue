@@ -15,6 +15,12 @@
         {{ errors.description[0] }}
       </div>
 
+      <label>Address: </label>
+      <input v-model="form.address" type="text" name="address" :class="{ 'is-invalid': errors.text }" placeholder="address">
+      <div class="invalid-feedback" v-if="errors.address">
+        {{ errors.address[0] }}
+      </div>
+
       <label>Phone: </label>
       <input type="tel" v-mask="'+375 (##) ### ## ##'" v-model="form.phone.number">
 
@@ -36,6 +42,7 @@ export default {
       form: {
         title: '',
         description: '',
+        address: '',
         phone: {
           number: ''
         },
@@ -48,13 +55,13 @@ export default {
   methods: {
     async create() {
       try {
-        await this.$axios.post('/vacancy/' + this.cte_id, this.form, {})
+        await this.$axios.post('/organization/' + this.cte_id, this.form, {})
       } catch (e) {
         console.log(this.errors)
       }
     },
-    async createTemporaryVacancy() {
-      await this.$axios.post('/vacancy-cte', {}, {})
+    async createTemporaryOrganization() {
+      await this.$axios.post('/organization-cte', {}, {})
         .then(result => {
           this.cte_id = result.data.data
         })
@@ -64,7 +71,7 @@ export default {
     },
   },
   mounted() {
-    this.createTemporaryVacancy()
+    this.createTemporaryOrganization()
   }
 }
 </script>

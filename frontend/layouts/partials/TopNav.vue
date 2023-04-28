@@ -36,6 +36,9 @@
       <div class="bot_header_in">
         <nuxt-link to="/vacancies">Vacancies</nuxt-link>
       </div>
+      <div class="bot_header_in">
+        <nuxt-link to="/organizations">Organizations</nuxt-link>
+      </div>
     </div>
   </div>
 </template>

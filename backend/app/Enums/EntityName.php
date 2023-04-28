@@ -8,4 +8,5 @@ enum EntityName: string
     case Poster = 'poster';
     case CV = 'cv';
     case Vacancy = 'vacancy';
+    case Organization = 'organization';
 }

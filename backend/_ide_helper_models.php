@@ -230,10 +230,14 @@ namespace App\Models{
  * @property string $description
  * @property string $address
  * @property string $link
+ * @property string $phone
+ * @property int $author_id
  * @property int $entity_type_id
  * @property int $status_id
+ * @property-read \App\Models\User|null $user
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\EntityStatus|null $entityStatus
  * @method static \Illuminate\Database\Eloquent\Builder|Organization newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Organization newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Organization query()

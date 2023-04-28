@@ -29,6 +29,12 @@
             <nuxt-link to="/personal-cabinet/vacancy/create">Create</nuxt-link>
             <nuxt-link to="/personal-cabinet/vacancy/">Show all</nuxt-link>
           </div>
+
+          <div>Organizations:</div>
+          <div class="create-organization">
+            <nuxt-link to="/personal-cabinet/organization/create">Create</nuxt-link>
+            <nuxt-link to="/personal-cabinet/organization/">Show all</nuxt-link>
+          </div>
         </div>
       </div>
     </template>

@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\Articles\AdminArticleController;
 use App\Http\Controllers\Admin\Articles\ArticleSearchController;
 use App\Http\Controllers\Admin\CV\AdminCVController;
 use App\Http\Controllers\Admin\CV\CVSearchController;
+use App\Http\Controllers\Admin\Organizations\AdminOrganizationController;
+use App\Http\Controllers\Admin\Organizations\OrganizationSearchController;
 use App\Http\Controllers\Admin\Vacancy\VacancySearchController;
 use App\Http\Controllers\Admin\Posters\AdminPosterController;
 use App\Http\Controllers\Admin\Posters\PosterSearchController;
@@ -16,8 +18,10 @@ use App\Http\Controllers\API\MeController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PersonalCabinet\ArticlePersonalCabinetController;
 use App\Http\Controllers\PersonalCabinet\CVPersonalCabinetController;
+use App\Http\Controllers\PersonalCabinet\OrganizationPersonalCabinetController;
 use App\Http\Controllers\PersonalCabinet\PosterPersonalCabinetController;
 use App\Http\Controllers\PersonalCabinet\VacancyPersonalCabinetController;
 use App\Http\Controllers\PosterController;
@@ -68,6 +72,10 @@ Route::get('/cv/{cv}' ,[CVController::class, 'showOne'])->name('cvs.showOne');
 Route::get('/vacancies', [VacancyController::class, 'showAll'])->name('vacancies.index');
 Route::get('/vacancy/{vacancy}' ,[VacancyController::class, 'showOne'])->name('vacancies.showOne');
 
+//Organizations
+Route::get('/organizations', [OrganizationController::class, 'showAll'])->name('organizations.index');
+Route::get('/organization/{organization}' ,[OrganizationController::class, 'showOne'])->name('organizations.showOne');
+
 Route::group(['middleware' => 'jwt.auth'], static function () {
     Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
     Route::get('/me', [MeController::class, 'index']);
@@ -113,6 +121,14 @@ Route::group(['middleware' => 'jwt.auth'], static function () {
         Route::get('/get-vacancy-categories', [VacancyPersonalCabinetController::class, 'getCategories'])->name('vacancy.get-categories');
             //Create temporary Entity
             Route::post('/vacancy-cte', [VacancyPersonalCabinetController::class, 'createTemporaryVacancy'])->name('vacancy.cte');
+
+        //Organizations
+        Route::get('/my-organizations', [OrganizationPersonalCabinetController::class, 'getMyOrganizations'])->name('pc.organizations.index');
+        Route::get('/organization/edit/{id}' ,[OrganizationPersonalCabinetController::class, 'edit'])->name('organization.edit');
+        Route::post('/organization/{organization}', [OrganizationPersonalCabinetController::class, 'update'])->name('organization.update');
+        Route::get('/get-organization-categories', [OrganizationPersonalCabinetController::class, 'getCategories'])->name('organization.get-categories');
+            //Create temporary Entity
+            Route::post('/organization-cte', [OrganizationPersonalCabinetController::class, 'createTemporaryOrganization'])->name('organization.cte');
 });
 
 // Admin
@@ -162,4 +178,15 @@ Route::group(['prefix' => '/admin'], static function () {
             Route::get('/vacancy/search', [VacancySearchController::class, 'search']);
             //CountAllVacancies
             Route::get('/count-vacancies', [AdminVacancyController::class, 'getCountAllVacancies']);
+
+        // Organization
+        Route::get('/organizations', [AdminOrganizationController::class, 'showAll'])->name('admin.organizations.index');
+        Route::get('/organization/edit/{id}' ,[AdminOrganizationController::class, 'edit'])->name('admin.organization.edit');
+        Route::patch('/organization/approve/{id}' ,[AdminOrganizationController::class, 'approve'])->name('admin.organization.approve');
+        Route::delete('/organization/delete/{id}' ,[AdminOrganizationController::class, 'delete'])->name('admin.organization.delete');
+        Route::get('/organization-categories', [AdminOrganizationController::class, 'getCategories'])->name('admin.organization-categories.index');
+            // Search
+            Route::get('/organization/search', [OrganizationSearchController::class, 'search']);
+            //CountAllOrganizations
+            Route::get('/count-organizations', [AdminOrganizationController::class, 'getCountAllOrganizations']);
 });
