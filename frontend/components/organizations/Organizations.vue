@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="vacancies">
-      <div class="vacancy" v-for="vacancy in vacancies">
-        <nuxt-link v-if=" vacancy.title" :to="'/vacancies/' + vacancy.id">
-          <div>{{ vacancy.title}}</div>
+    <div class="organizations">
+      <div class="organization" v-for="organization in organizations">
+        <nuxt-link v-if=" organization.title" :to="'/organizations/' + organization.id">
+          <div>{{ organization.title}}</div>
         </nuxt-link>
       </div>
       <div v-if="is_main === 'true'" class="btns-main my-5">
@@ -40,7 +40,7 @@
 
 <script>
 export default {
-  name: "Vacancies",
+  name: "Organizations",
   props: [
     'count',
     'is_main',
@@ -48,15 +48,15 @@ export default {
   data () {
     return {
       page: 1,
-      vacancies: [],
+      organizations: [],
       meta: {}
     }
   },
   methods: {
     async fetchData() {
-      await this.$axios.get('/vacancies?page=' + this.page + '&count=' + this.count)
+      await this.$axios.get('/organizations?page=' + this.page + '&count=' + this.count)
           .then((res) => {
-            this.vacancies = res.data.data
+            this.organizations = res.data.data
             this.meta = res.data.meta
           })
           .catch(err => console.log(err))

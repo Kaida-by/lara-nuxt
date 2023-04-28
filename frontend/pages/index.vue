@@ -11,6 +11,9 @@
 
     <nuxt-link to="/vacancies">Vacancies</nuxt-link>
     <vacancies count="4" is_main=true></vacancies>
+
+    <nuxt-link to="/vacancies">Organizations</nuxt-link>
+    <organizations count="4" is_main=true></organizations>
   </div>
 </template>
 
@@ -20,6 +23,7 @@ import Articles from "~/components/articles/Articles";
 import Posters from "~/components/posters/Posters";
 import Cvs from "~/components/cvs/Cvs";
 import Vacancies from "~/components/vacancies/Vacancies";
+import Organizations from "~/components/organizations/Organizations";
 
 export default {
   name: 'IndexPage',
@@ -28,6 +32,7 @@ export default {
     Posters,
     Cvs,
     Vacancies,
+    Organizations,
   }
 }
 

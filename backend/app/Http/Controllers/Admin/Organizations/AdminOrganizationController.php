@@ -2,16 +2,16 @@
 
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 
-namespace App\Http\Controllers\Admin\CV;
+namespace App\Http\Controllers\Admin\Organizations;
 
-use App\Data\ResourceData\CVData;
+use App\Data\ResourceData\OrganizationData;
 use App\Enums\EntityCategory;
 use App\Enums\EntityName;
 use App\Enums\EntityType;
 use App\Http\Requests\AdminEntityRequest;
 use App\Http\Services\AbstractAdminEntityHelper;
 use App\Http\Services\EntityHelper;
-use App\Models\CV;
+use App\Models\Organization;
 use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
@@ -19,14 +19,14 @@ use Spatie\LaravelData\PaginatedDataCollection;
 
 use function response;
 
-class AdminCVController extends AbstractAdminEntityHelper
+class AdminOrganizationController extends AbstractAdminEntityHelper
 {
     public function showAll(): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
         $categoryId = (int) request('categoryId');
-        $cvs = $this->getAllEntityData(new CV(), $categoryId);
+        $organizations = $this->getAllEntityData(new Organization(), $categoryId);
 
-        return CVData::collection($cvs);
+        return OrganizationData::collection($organizations);
     }
 
     public function getCategories(): JsonResponse
@@ -40,26 +40,26 @@ class AdminCVController extends AbstractAdminEntityHelper
         ]);
     }
 
-    public function edit(int $id): CVData
+    public function edit(int $id): OrganizationData
     {
-        $cv = $this->getOneEntityData(new CV(), $id, EntityType::CV->value);
+        $organization = $this->getOneEntityData(new Organization(), $id, EntityType::Organization->value);
 
-        return CVData::from($cv);
+        return OrganizationData::from($organization);
     }
 
     public function approve(int $id, AdminEntityRequest $request): void
     {
         $status = !$request['checked'] ? 2 : 1;
-        $this->approveEntity(new CV(), $id, $status, EntityName::CV-> value);
+        $this->approveEntity(new Organization(), $id, $status, EntityName::Organization->value);
     }
 
     public function delete(int $id): JsonResponse
     {
-        return $this->deleteEntity(new CV(), $id, EntityName::CV-> value);
+        return $this->deleteEntity(new Organization(), $id, EntityName::Organization->value);
     }
 
-    public function getCountAllCVs(): int
+    public function getCountAllOrganizations(): int
     {
-        return CVData::collection(CV::all())->count();
+        return OrganizationData::collection(Organization::all())->count();
     }
 }
