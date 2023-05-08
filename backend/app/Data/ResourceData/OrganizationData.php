@@ -6,6 +6,8 @@ namespace App\Data\ResourceData;
 use App\Models\Organization;
 use App\Models\Phone;
 use App\Models\User;
+use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 
 class OrganizationData extends Data
@@ -20,6 +22,7 @@ class OrganizationData extends Data
         public null|string $link,
         public Phone $phone,
         public User $user,
+        public Collection $images,
     ) {}
 
     public static function fromModel(Organization $organization): self
@@ -34,6 +37,7 @@ class OrganizationData extends Data
             link: $organization->link,
             phone: $organization->phone,
             user: $organization->user,
+            images: $organization->images,
         );
     }
 }

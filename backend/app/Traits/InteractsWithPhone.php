@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpMultipleClassDeclarationsInspection */
+
 namespace App\Traits;
 
 use App\Models\Phone;

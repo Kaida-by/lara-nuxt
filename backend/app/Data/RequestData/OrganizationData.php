@@ -2,11 +2,13 @@
 
 namespace App\Data\RequestData;
 
+use Illuminate\Http\Request;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Url;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 use Symfony\Contracts\Service\Attribute\Required;
 
 class OrganizationData extends Data
@@ -21,4 +23,6 @@ class OrganizationData extends Data
     public ?string $link;
     #[DataCollectionOf(PhoneData::class)]
     public PhoneData $phone;
+    #[DataCollectionOf(ImageData::class)]
+    public DataCollection $files;
 }

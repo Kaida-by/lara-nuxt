@@ -16,7 +16,6 @@ use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\CursorPaginatedDataCollection;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\PaginatedDataCollection;
-use Throwable;
 
 use function response;
 

@@ -13,6 +13,7 @@ use App\Enums\EntityType;
 use App\Events\Notifications;
 use App\Http\Services\AbstractPersonalCabinetHelper;
 use App\Http\Services\EntityHelper;
+use App\Http\Services\UploadImagesService;
 use App\Models\Organization;
 use App\Models\Phone;
 use App\Models\User;
@@ -75,6 +76,16 @@ class OrganizationPersonalCabinetController extends AbstractPersonalCabinetHelpe
                 'entity_type_id' => EntityType::Organization->value,
                 'status_id' => EntityStatus::UnderModeration->value,
             ]);
+
+            foreach ($data->files as $file) {
+                UploadImagesService::upload(
+                    $file->file,
+                    EntityType::Organization->value,
+                    $organization->id,
+                    1,
+                    true,
+                );
+            }
 
             /** @var User $user */
             $user = Auth::user();

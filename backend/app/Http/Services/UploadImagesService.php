@@ -1,10 +1,11 @@
-<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+<?php
+
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 namespace App\Http\Services;
 
 use App\Http\Controllers\CloudController;
 use App\Http\Interfaces\EntityInterface;
-use App\Models\Article;
 use App\Models\Image;
 use Exception;
 use RuntimeException;
@@ -14,9 +15,6 @@ use Illuminate\Support\Str;
 
 class UploadImagesService
 {
-    /**
-     * @throws Exception
-     */
     public static function save(
         int $entity_type,
         int $entity_id,
@@ -37,9 +35,6 @@ class UploadImagesService
         return $is_upload;
     }
 
-    /**
-     * @throws Exception
-     */
     public static function upload
     (
         UploadedFile|stdClass $uploadedFile,
@@ -182,11 +177,6 @@ class UploadImagesService
         return $imagesName;
     }
 
-    /**
-     * @param Article $article
-     * @param array $usedImages
-     * @return void
-     */
     public static function removeUnusedImages(EntityInterface $entity, array $usedImages): void
     {
         $allUserImages = $entity->images;
@@ -204,10 +194,6 @@ class UploadImagesService
         }
     }
 
-    /**
-     * @param string $tag
-     * @return string
-     */
     public static function getImageFileNameFromTag(string $tag): string
     {
         preg_match('~(?<=src=")[^"]+(?=")~', $tag, $arr);
@@ -215,10 +201,6 @@ class UploadImagesService
         return $arr[0] ?? '';
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     public static function getImageFileUuidFromPath(string $path): string
     {
         $partsPath = explode('/', $path);

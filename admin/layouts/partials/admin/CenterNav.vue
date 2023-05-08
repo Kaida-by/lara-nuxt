@@ -1,12 +1,10 @@
 <template>
-  <div class="center_area p-12 grid gap-4 grid-cols-5">
+  <div class="center_area p-12 grid gap-4 grid-cols-4">
     <nuxt-link to="/admin/articles" class="entity">Articles</nuxt-link>
     <nuxt-link to="/admin/users" class="entity">Users</nuxt-link>
     <nuxt-link to="/admin/articles" class="entity">Announcements</nuxt-link>
     <nuxt-link to="/admin/cvs" class="entity">CVs</nuxt-link>
     <nuxt-link to="/admin/organizations" class="entity">Organizations</nuxt-link>
-    <nuxt-link to="/admin/users" class="entity">Photo facts</nuxt-link>
-    <nuxt-link to="/admin/articles" class="entity">Photo Galleries</nuxt-link>
     <nuxt-link to="/admin/posters" class="entity">Posters</nuxt-link>
     <nuxt-link to="/admin/vacancies" class="entity">Vacancies</nuxt-link>
   </div>
@@ -14,7 +12,7 @@
 
 <script>
 export default {
-name: "CenterNav"
+  name: "CenterNav"
 }
 </script>
 

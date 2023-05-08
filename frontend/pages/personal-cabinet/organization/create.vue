@@ -24,6 +24,17 @@
       <label>Phone: </label>
       <input type="tel" v-mask="'+375 (##) ### ## ##'" v-model="form.phone.number">
 
+      <label>Image:</label>
+            <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)">
+            <div class="preview">
+              <draggable v-model="form.files" :animation="300" @start="drag=true" @end="drag=false">
+                <div class="img" v-for="(image, key) in form.files">
+                  <img class="image_i" :src="image.src" alt="">
+                  <span class="remove-file" v-on:click="removeFile( key )">✘</span>
+                </div>
+              </draggable>
+            </div>
+
       <input type="submit" value="Create">
     </form>
 
@@ -34,6 +45,9 @@
 </template>
 
 <script>
+
+import _ from 'lodash'
+
 export default {
   name: "create",
   middleware: 'auth',
@@ -47,6 +61,12 @@ export default {
           number: ''
         },
         author_id: this.$auth.user.id,
+        files: [],
+      },
+      newFile: {
+        name: undefined,
+        file: undefined,
+        src: undefined
       },
       error: this.$route.query.error,
       cte_id: '',
@@ -54,10 +74,30 @@ export default {
   },
   methods: {
     async create() {
+      // for (let i = 0; i < this.form.files.length; i++) {
+      //   this.form.files['files' + i ] = this.form.files[i].file
+      // }
+      // let formData = new FormData();
+      // console.log(this.files)
+      // formData.append('file', this.files[0].file);
+
+      let form = new FormData();
+      for ( let i = 0; i < this.form.files.length; i++ ) {
+        let file = this.form.files[i].file;
+        form.append(`files[${i}][file]`, file)
+      }
+      _.each(this.form, (value, key) => {
+        if (key === 'phone') {
+            form.append(`phone[number]`, this.form.phone.number)
+        } else {
+          form.append(key, value)
+        }
+      });
+
       try {
-        await this.$axios.post('/organization/' + this.cte_id, this.form, {})
-      } catch (e) {
-        console.log(this.errors)
+        await this.$axios.post('/organization/' + this.cte_id, form, {})
+      } catch (err) {
+        console.log(err)
       }
     },
     async createTemporaryOrganization() {
@@ -68,6 +108,27 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    handleImages(e) {
+      const files = e.target.files || e.dataTransfer.files
+
+      for(let i = 0; i < files.length; i++) {
+        let reader = new FileReader()
+        reader.onload = (e) => {
+          this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
+          if (this.form.files.length === 0) {
+            this.form.files.push(this.newFile)
+          } else {
+            this.form.files.shift()
+            this.form.files.push(this.newFile)
+          }
+        }
+
+        reader.readAsDataURL(files[i])
+      }
+    },
+    removeFile( key ) {
+      this.form.files.splice( key, 1 );
     },
   },
   mounted() {

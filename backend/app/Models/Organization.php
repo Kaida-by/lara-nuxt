@@ -4,6 +4,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasPhone;
 use App\Http\Interfaces\EntityInterface;
 use App\Traits\InteractsWithPhone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Laravel\Scout\Searchable;
 
-class Organization extends Model implements EntityInterface
+class Organization extends Model implements EntityInterface, HasPhone
 {
     use HasFactory, Searchable, InteractsWithPhone;
 
@@ -24,7 +25,6 @@ class Organization extends Model implements EntityInterface
         'link',
         'author_id',
         'entity_type_id',
-        'category_id',
         'status_id',
     ];
 
