@@ -77,12 +77,12 @@ class OrganizationPersonalCabinetController extends AbstractPersonalCabinetHelpe
                 'status_id' => EntityStatus::UnderModeration->value,
             ]);
 
-            foreach ($data->files as $file) {
+            foreach ($data->images as $key => $file) {
                 UploadImagesService::upload(
                     $file->file,
                     EntityType::Organization->value,
                     $organization->id,
-                    1,
+                    $key + 1,
                     true,
                 );
             }

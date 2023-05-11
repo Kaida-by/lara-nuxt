@@ -25,15 +25,25 @@
       <input type="tel" v-mask="'+375 (##) ### ## ##'" v-model="form.phone.number">
 
       <label>Image:</label>
-            <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)">
-            <div class="preview">
-              <draggable v-model="form.files" :animation="300" @start="drag=true" @end="drag=false">
-                <div class="img" v-for="(image, key) in form.files">
-                  <img class="image_i" :src="image.src" alt="">
-                  <span class="remove-file" v-on:click="removeFile( key )">✘</span>
-                </div>
-              </draggable>
-            </div>
+<!--      <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)">-->
+<!--      <div class="preview">-->
+<!--        <draggable v-model="form.files" :animation="300" @start="drag=true" @end="drag=false">-->
+<!--          <div class="img" v-for="(image, key) in form.files">-->
+<!--            <img class="image_i" :src="image.src" alt="">-->
+<!--            <span class="remove-file" v-on:click="removeFile( key )">✘</span>-->
+<!--          </div>-->
+<!--        </draggable>-->
+<!--      </div>-->
+      <input type="file" id="files" ref="files" accept="image/*" @change="handleImages($event)" multiple>
+
+      <div class="preview">
+        <draggable v-model="form.images" :animation="300" @start="drag=true" @end="drag=false">
+          <div class="img" v-for="(image, key) in form.images">
+            <img class="image_i" :src="image.src" alt="">
+            <span class="remove-file" v-on:click="removeFile( key )">✘</span>
+          </div>
+        </draggable>
+      </div>
 
       <input type="submit" value="Create">
     </form>
@@ -61,7 +71,7 @@ export default {
           number: ''
         },
         author_id: this.$auth.user.id,
-        files: [],
+        images: [],
       },
       newFile: {
         name: undefined,
@@ -82,9 +92,9 @@ export default {
       // formData.append('file', this.files[0].file);
 
       let form = new FormData();
-      for ( let i = 0; i < this.form.files.length; i++ ) {
-        let file = this.form.files[i].file;
-        form.append(`files[${i}][file]`, file)
+      for ( let i = 0; i < this.form.images.length; i++ ) {
+        let file = this.form.images[i].file;
+        form.append(`images[${i}][file]`, file)
       }
       _.each(this.form, (value, key) => {
         if (key === 'phone') {
@@ -116,11 +126,11 @@ export default {
         let reader = new FileReader()
         reader.onload = (e) => {
           this.newFile = { name: files[i].name, file: files[i], src: e.target.result };
-          if (this.form.files.length === 0) {
-            this.form.files.push(this.newFile)
+          if (this.form.images.length === 0) {
+            this.form.images.push(this.newFile)
           } else {
-            this.form.files.shift()
-            this.form.files.push(this.newFile)
+            this.form.images.shift()
+            this.form.images.push(this.newFile)
           }
         }
 
@@ -128,7 +138,7 @@ export default {
       }
     },
     removeFile( key ) {
-      this.form.files.splice( key, 1 );
+      this.form.images.splice( key, 1 );
     },
   },
   mounted() {
@@ -138,5 +148,38 @@ export default {
 </script>
 
 <style scoped>
-
+  .preview {
+    display: flex;
+  }
+  .preview > div {
+    display: flex;
+  }
+  .img {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .image_i {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+  .img span {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: white;
+    font-family: sans-serif;
+    padding: 3px 2px 4px 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
 </style>

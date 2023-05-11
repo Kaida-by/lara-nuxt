@@ -2,7 +2,6 @@
 
 namespace App\Data\RequestData;
 
-use Illuminate\Http\Request;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\StringType;
@@ -24,5 +23,6 @@ class OrganizationData extends Data
     #[DataCollectionOf(PhoneData::class)]
     public PhoneData $phone;
     #[DataCollectionOf(ImageData::class)]
-    public DataCollection $files;
+    public DataCollection $images;
+//    public array $images;
 }

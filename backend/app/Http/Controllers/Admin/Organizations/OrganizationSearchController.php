@@ -16,8 +16,8 @@ class OrganizationSearchController extends Controller
 {
     public function search(Request $request): DataCollection|CursorPaginatedDataCollection|PaginatedDataCollection
     {
-        $cvs = Organization::search($request->get('query'))->get();
+        $organizations = Organization::search($request->get('query'))->get();
 
-        return OrganizationData::collection($cvs);
+        return OrganizationData::collection($organizations);
     }
 }
